@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { createAnalyticsController, campaignContext, eventData, observeForm, readConsent, saveConsent, CONSENT_KEY, UMAMI_WEBSITE_ID } from "../src/lib/analytics.ts";
 import type { AnalyticsPayload } from "../src/lib/analytics.ts";
 
-const location = (variant = "ad_a") => ({ pathname: "/", href: `https://etf-kompas-zeta.vercel.app/?utm_source=meta&utm_medium=paid_social&utm_campaign=clientelo_demo&utm_content=${variant}&email=private%40example.com&amount=999999#secret`, referrer: "https://www.facebook.com/private?email=private@example.com" });
+const location = (variant = "ad_a") => ({ pathname: "/", href: `https://etf-kompas-zeta.vercel.app/?utm_source=meta&utm_medium=paid_social&utm_campaign=etf_kompas_demo&utm_content=${variant}&email=private%40example.com&amount=999999#secret`, referrer: "https://www.facebook.com/private?email=private@example.com" });
 function measured(variant = "ad_a") {
   const controller = createAnalyticsController(), sent: AnalyticsPayload[] = [];
   controller.setConsent(true, true); controller.enter(location(variant)); controller.ready(payload => { sent.push(payload); });
@@ -35,7 +35,7 @@ test("withdrawal closes hook and queue immediately, including outstanding attemp
 });
 test("strict campaign values, duplicate keys, URL/query/hash and referrer are sanitized", () => {
   const a = campaignContext(location().href, location().referrer);
-  assert.equal(a.url, "/?utm_source=meta&utm_medium=paid_social&utm_campaign=clientelo_demo&utm_content=ad_a");
+  assert.equal(a.url, "/?utm_source=meta&utm_medium=paid_social&utm_campaign=etf_kompas_demo&utm_content=ad_a");
   assert.equal(a.referrer, "https://www.facebook.com");
   assert.equal(campaignContext(location("ad_b").href, "").variant, "ad_b");
   for (const suffix of ["utm_source=private@example.com", "utm_campaign=private@example.com", "utm_content=ad_a&utm_content=ad_b", "utm_content=arbitrary"]) {

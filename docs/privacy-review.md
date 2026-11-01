@@ -1,111 +1,127 @@
-# Revize informací o osobních údajích — 27. 10. 2026
+# Technical Privacy Review
 
-## Aktuální stav demonstračního provozu — 28. 10. 2026
+Initial review: 27 October 2026. Current demo-state summary: 28 October 2026. Public privacy-page wording was generalized on 1 November 2026.
 
-Tento souhrn má přednost před staršími popisy plánovaného nasazení a neomezeného doručování níže. Historické záznamy zůstávají zachované.
+This is a technical review of the implemented application and documented provider behavior. It is not legal advice or confirmation that every legal, contractual, and transfer requirement has been resolved.
 
-- **Technické fungování:** nasazený demonstrační režim `d83f3aa` omezuje obě cesty doručování společným serverovým allowlistem. `DEMO_ALLOWED_EMAILS` vyžaduje přesně dvě různé platné adresy; jejich hodnoty zde nejsou uvedeny. Seznam se uchovává v serverové konfiguraci a není předáván prohlížeči, analytice ani diagnostickým logům. Nejde o databázi kontaktů získaných z formulářů.
-- **Odmítnuté požadavky:** i nepovolená adresa a související data projdou hostingem a serverem; před kontrolou příjemce probíhá validace a Siteverify. Nepovolený požadavek není předán Resendu a PDF se pro něj nenačítá. Chybějící nebo neplatný allowlist doručování zablokuje. Samotné demo odmítnutí nevysílá `form_error` ani `material_accepted`; skutečný pokus zůstává `form_submit` po souhlasu.
-- **Potvrzení vlastníka:** vlastník potvrdil produkční nasazení `d83f3aa`, úspěšné doručení HTML reportu i PDF na schválenou adresu a odmítnutí nepovolené adresy. Nejde o nové integrační testy provedené agentem v této etapě. Reklamní kampaně ani získávání kontaktů pro marketing nejsou spuštěné.
-- **Účel a rozsah:** projekt je veřejně dostupné nekomerční demo pro výběrové řízení Clientelo. Také nyní zpracovává osobní údaje při provozu webu, formulářů, Turnstile a případně dobrovolné analytiky. Veřejné texty používají označení „předem schválení testovací příjemci“, nikoli počet nebo hodnoty adres.
+## Current demo state
 
-### Otevřené otázky současného dema
+- **Delivery:** both email flows are restricted by the server-side `DEMO_ALLOWED_EMAILS` allowlist. It requires exactly two distinct valid addresses. Their values are not published and are never sent to the browser, analytics, or application diagnostics.
+- **Rejected requests:** an entered address and related request data still pass through hosting and the application server. Input validation and Siteverify occur before the recipient check. A non-approved request is not sent to Resend and the PDF is not read.
+- **Operational confirmation:** the owner confirmed delivery of both the HTML report and PDF guide to approved recipients and rejection of a non-approved address. No new agent-performed production integration test is claimed.
+- **Purpose:** ETF Kompas is a public, personal, non-commercial demonstration created as a practical developer recruitment assignment and maintained as an independent portfolio project. No advertising campaign or marketing-contact collection is running.
+- **Public wording:** the application refers to pre-approved test recipients without publishing their number or values. The original company name is not needed to describe current operation.
 
-Dokumentované posouzení právních základů doručování, kontroly oprávněných příjemců, bezpečnosti a provozní diagnostiky dosud není uzavřené. Chybí také doložení použitelného zpracovatelského ujednání pro Vercel Hobby, konkrétních regionů a logů a odpovídajících přenosových záruk. Veřejné [Vercel DPA](https://vercel.com/legal/dpa) vymezuje působnost pro Pro a Enterprise; kontaktování právního oddělení ani potvrzení pro Hobby neproběhlo.
+Technically verified delivery restrictions do not establish legal readiness. Calling the application a demo and publishing open questions do not resolve those questions.
 
-[Resend DPA, část 6](https://resend.com/legal/dpa) uvádí primární zpracování v USA a upravuje příslušné SCC. Použitelné podmínky účtu a přenosové záruky musí správce doložit. Odkaz na DPA není auditem konkrétní smlouvy. Veřejná dokumentace Resendu uvádí 30denní retenci běžných tarifů; konkrétní provozní podmínky účtu a open/click tracking zde nejsou potvrzeny.
+## Controller and public contact
 
-Dosud nejsou uzavřené lhůty nebo kritéria uchovávání allowlistu, technických signálů Cloudflare, provozních záznamů a korespondence při vyřizování práv. Zůstává ověření podmínek poskytovatelů, jejich rolí, odstranění údajů, mezinárodních přenosů a úplného síťového/úložného chování na produkci. Dřívější potvrzení vlastníka o režimu Managed a vypnutém pre-clearance není novou kontrolou účtu. Technické doručení a odmítnutí nejsou kompletním auditem soukromí.
+The controller is **Michal Růžička**, a natural person operating ETF Kompas as a personal non-commercial demo. The original assignment's commissioning party is not presented as the operator or controller of visitor data.
 
-**Technicky ověřené omezení doručování není potvrzením právní připravenosti. Otevřené otázky současného dema nelze odložit pouze označením za podmínky budoucího ostrého provozu. Jejich transparentní zveřejnění je samo právně neřeší.**
+The owner designated `privacy@michalwebdeveloper.cz` as the public contact and reported successful two-way testing. The application receives the contact through the separate server variable `PRIVACY_CONTACT_EMAIL`; it never falls back to Resend sender credentials. Invalid or missing configuration displays an unresolved notice without changing either delivery flow.
 
-### Další podmínky případného rozšíření
+The privacy page is prerendered. Changing the public contact or related public configuration requires a new build/deployment.
 
-Před běžnou veřejnou službou, reklamními kampaněmi nebo získáváním kontaktů je nutné nejprve uzavřít současné otevřené otázky a poté znovu posoudit rozsah zpracování, informační texty, ochranu proti zneužití a interpretaci konverzí. Demo měření není výsledkem skutečné kampaně. Případný marketing nebo nový účel by vyžadoval samostatné posouzení; nyní není implementován.
+## Verified processing map
 
-### Rozsah textové aktualizace
-
-Správce a veřejný kontakt zůstávají zachované. Úpravy sjednocují popis odmítnutých žádostí, serverové konfigurace a příjemců, USA u Resendu a současných otevřených podmínek. Nezměněna výpočetní logika, allowlist, doručovací tok, bezpečnost ani analytické schéma a souhlas. Závěrečný odkaz PDF byl opraven na existující produkční kotvu `https://etf-kompas-zeta.vercel.app/#kalkulacka`; ostatní vzdělávací obsah se nemění.
-
-## Účel a stav
-
-Osobní nekomerční demonstrace pro výběrové řízení Clientelo. Nová App Router stránka `/ochrana-osobnich-udaju` je veřejně dostupná v aplikaci bez formulářů a bez vlastního Turnstile loaderu. Uvádí skutečné zpracování a zřetelné nedokončené položky. Neoznačuje nekomerční demo za výjimku z GDPR.
-
-Vlastník poskytl jméno správce **Michal Růžička**, fyzická osoba. Následně dne 27. 10. 2026 určil veřejný e-mail `privacy@michalwebdeveloper.cz` a potvrdil jeho obousměrné otestování pro příjem i odesílání. Jde o potvrzení vlastníka; agent žádnou testovací zprávu neposílal. `PRIVACY_CONTACT_EMAIL` je oddělené serverové nastavení veřejného kontaktu; po validaci se zobrazí na stránce a v bezpečně zakódovaném mailto odkazu. Chybějící či neplatný kontakt nevede k použití odesílatele z Resendu. V takovém případě se ukáže nedokončená položka, zatímco obě stávající cesty doručování zůstávají funkčně beze změn. Stránka je prerenderovaná: změna kontaktu vyžaduje nový build/deployment.
-
-## Co bylo ověřeno v kódu
-
-| Oblast | Skutečný tok |
+| Area | Implemented flow |
 | --- | --- |
-| Formuláře | E-mail, typ materiálu, honeypot, token; report navíc posílá zvolená ETF a modelové vstupy. Bez backendové registrace kontaktu. |
-| Report handler | Validuje allowlist a znovu počítá existujícím modelem. Resendu předá příjemce a HTML/text se scénářem a výsledky. |
-| Guide handler | Resendu předá příjemce, HTML/text a obecné PDF načtené z pevné cesty; neposílá scénář kalkulačky. |
-| Cloudflare | Prohlížeč komunikuje přímo s Turnstile při načtení/ověření widgetu, i před odesláním. Serverový Siteverify payload obsahuje secret a response token; neobsahuje e-mail, scénář ani explicitně remoteip. To nevylučuje zpracování IP prohlížeče u Cloudflare. |
-| Opakované požadavky | HMAC identifikátor Resendu je odvozený z celého payloadu včetně příjemce. Není databází kontaktů ani tvrzením o anonymitě. |
-| Ukládání | Runtime kód neobsahuje databázi ani zápis formulářů do souboru. PDF se jen čte. Resend a další infrastruktura mohou údaje uchovávat. |
-| Logy | Kód src nemá console log/info/warn/error/debug volání a handler nevrací interní výjimky. Provozní logování poskytovatelů nebylo z účtů ověřeno. |
-| Úložiště/analytika | Vlastní kód nevolá document.cookie/cookies, localStorage ani sessionStorage pro kontakty; nemá Vercel Analytics, Google Analytics nebo marketingový pixel. Použití Turnstile není absence zpracování. |
-| Písma | `next/font/google` fonty připraví při buildu a obsluhuje z aplikace. Návštěvnická stránka neobsahuje Google Fonts stylesheet. |
-| Hosting | Vercel je plánovaný. Nasazení ani konkrétní smluvní/regionální konfigurace nebyly potvrzeny. Pokud ho použijeme, budou přes něj procházet i formulářové požadavky. |
+| Forms | Email address, material type, honeypot, Turnstile token; the report also submits selected ETFs and model inputs. No backend contact registration. |
+| Report | Validates recipient and scenario, recalculates on the server, and passes the recipient plus HTML/text report to Resend. |
+| Guide | Passes the approved recipient, HTML/text message, and a general PDF loaded from a fixed path to Resend. It does not send calculator inputs. |
+| Turnstile | The browser communicates with Cloudflare while loading and verifying the widget. Server Siteverify receives the secret and response token, not the email or investment scenario. Cloudflare may still process the browser IP and technical signals. |
+| Request identity | A random UUID represents one logical request in client memory. The server derives a material-specific HMAC idempotency key. It is not a visitor ID and is not sent to Umami or application diagnostics. |
+| Storage | Runtime application code has no form database and does not write submitted contacts to files. The PDF is read only. Providers may retain their own data. |
+| Diagnostics | Application logs contain only allowlisted delivery categories and optional provider status, never email addresses, tokens, UUIDs, content, or raw exceptions. Infrastructure logging was not fully audited. |
+| Analytics/storage | Contact data is not stored in cookies, `localStorage`, or `sessionStorage`. Consent preferences use limited browser storage. Umami loads only after explicit opt-in. |
+| Fonts | `next/font/google` prepares fonts at build time and the application serves them locally; the visitor page does not load a Google Fonts stylesheet. |
+| Hosting | Vercel serves the page and server endpoints, so form and network data pass through its infrastructure. |
 
-Při původní revizi nebyly otevřeny účty poskytovatelů ani odeslány zprávy. Následný krok doplnil pouze veřejný kontakt do .env.local se zachováním ostatního obsahu; žádné tajné hodnoty nebyly vypsány a skutečné zprávy nebyly agentem odeslány.
+## Current open questions
 
-## Právní základ a checkbox
+The documented assessment of legal bases for one-time delivery, recipient checking, form protection, and operational diagnostics is not complete. The following also remain to be established for the actual accounts and current demo:
 
-Kód technicky prokazuje jednorázovou žádost o materiál, nikoli sám o sobě všechny podmínky konkrétního právního titulu. Proto stránka nevydává doručení za potvrzený souhlas nebo smluvní plnění. Před veřejným provozem musí správce určit titul pro doručení i ochranu formulářů a zaznamenat jeho odůvodnění.
+- applicable Vercel Hobby data-processing terms, processing regions, logs, and contractual role;
+- applicable Resend terms, retention, open/click tracking, processing locations, and transfer safeguards;
+- Cloudflare Turnstile account settings, pre-clearance, signal retention, and the division between processor and independent-controller activities;
+- concrete retention periods or criteria for the allowlist, provider records, technical signals, and correspondence concerning data-subject requests;
+- subprocessors, countries of processing, transfer mechanisms outside the EEA, and any required supplementary safeguards;
+- complete production browser verification of network requests, cookies, storage, hosting additions, and provider tracking.
 
-Pro posouzení smluvního plnění podle čl. 6 odst. 1 písm. b) je třeba nejdříve doložit skutečný vztah bezplatné služby a nezbytnost zpracování pro tento vztah. Při případném oprávněném zájmu podle písm. f) doložit účel, nezbytnost a vyvážení zájmů. Pokud by se správce rozhodl pro souhlas podle písm. a), musí být konkrétní, informovaný, prokazatelný a odvolatelný; současné vyžádání materiálu se automaticky za takový mechanismus neprohlašuje. Konkrétní titul nebyl svévolně zvolen ani uživateli podstrčen.
+The public [Vercel DPA](https://vercel.com/legal/dpa) describes scope for Pro and Enterprise; applicability to the Hobby project has not been established. [Resend's DPA](https://resend.com/legal/dpa) states primary processing in the United States and addresses relevant Standard Contractual Clauses, but linking to a DPA is not an audit of the actual account or transfer. Resend's public documentation describes standard 30-day retention; the account-specific state and tracking configuration remain unverified.
 
-Preventivní checkbox „souhlasím se zásadami“ nepřidán: pouhé seznámení s informacemi není samostatným právním základem. Jednorázová žádost není marketingový odběr. Nová stránka a odkazy nejsou zavedením evidovaného souhlasu.
+Before ordinary public delivery, marketing campaigns, or contact acquisition, resolve the present open issues and reassess the broader processing, notices, abuse protection, and interpretation of conversions.
 
-## Cookies a banner
+## Legal basis and consent checkbox
 
-Nepřidán banner, protože audit vlastního kódu nezjistil analytické nebo marketingové ukládání. To nevylučuje chování Turnstile, hostingu, e-mailového trackingu ani změnu jejich nastavení. Před veřejným spuštěním ověřit skutečné úložiště a síťové požadavky v produkčním prohlížeči, nastavení pre-clearance a doménový tracking Resendu. Souhlas podle pravidel pro cookies a právní základ následného zpracování osobních údajů jsou rozdílné otázky. Nepotřebné technologie vyžadující souhlas nesmí být spuštěny jen na základě odkazu na tuto stránku.
+The code demonstrates a one-time request for a material but cannot itself determine every condition of the applicable legal basis.
 
-## Přesný seznam k doplnění nebo potvrzení vlastníkem
+If performance of a contract under Article 6(1)(b) GDPR is considered, the operator must establish the actual relationship and necessity of processing. If legitimate interests under Article 6(1)(f) are considered, document purpose, necessity, and balancing. If consent under Article 6(1)(a) is selected, it must be specific, informed, demonstrable, and withdrawable.
 
-1. Kontakt je určen a lokálně nastaven: `privacy@michalwebdeveloper.cz`. Příjem i odesílání potvrdil vlastník. Před deploymentem nastavit `PRIVACY_CONTACT_EMAIL` také v produkčním prostředí a potvrdit postup vyřizování žádostí. Nevyžaduje se zveřejnění smyšleného IČO nebo neověřené adresy bydliště.
-2. Potvrdit právní základ jednorázového doručení a ochrany formulářů, včetně potřebného odůvodnění a dokumentace. Případně doplnit odpovídající mechanismus až na základě tohoto rozhodnutí.
-3. Resend: ověřit skutečně použitelné podmínky/DPA, zpracovatele, region a retenci e-mailového obsahu, metadat a událostí. Veřejná dokumentace uvádí standardních 30 dnů; neprezentujeme to jako audit účtu. Zkontrolovat open/click tracking a nastavit podle deklarovaného účelu.
-4. Cloudflare: ověřit podmínky účtu, Turnstile režim a pre-clearance, retenci signálů a poskytovatelem deklarované vlastní zpracování. Rozlišovat ochranu webu na pokyn provozovatele a vlastní zlepšování detekce.
-5. Hosting: potvrdit skutečný Vercel projekt/tarif, role, logy a regiony. Veřejné DPA je výslovně vymezené pro Pro/Enterprise; pro plánovaný Hobby vyžádat potvrzení použitelného ujednání. Neuzavře-li se tento bod, zvolit vhodný tarif/hosting, bez automatické implementace placené služby.
-6. U všech poskytovatelů určit relevantní příjemce/subprocesory a země zpracování, konkrétní mechanismy přenosu mimo EHP a případná další opatření. Samotný odkaz na SCC či DPF neprokazuje vyřešení konkrétního přenosu.
-7. Určit a zveřejnit skutečné retenční lhůty/kritéria a postup odstranění u poskytovatelů; zahrnout provozní logy a korespondenci při uplatňování práv, ne pouze kontakty v aplikaci.
-8. V produkčním prohlížeči ověřit cookies a další úložiště, widget, hostingové doplňky a tracking. Podle výsledku přizpůsobit informace i případné řízení souhlasu. Aktualizovat datum po věcných změnách.
+The application deliberately does not add a generic “I agree to the privacy policy” checkbox. Acknowledging a notice is not an independent legal basis, and a one-time request is not a marketing subscription. The privacy page and links do not create a recorded consent mechanism for delivery.
 
-Do uzavření těchto bodů jde o **nedokončené informace pro veřejný sběr osobních údajů**, nikoli o potvrzení právní připravenosti. Funkční odesílání nebylo z tohoto důvodu technicky měněno ani obcházeno; veřejný deployment není součástí kroku.
+Analytics uses a separate explicit opt-in. It is not combined with material delivery, a newsletter, or an “ETF Watcher”. Refusing or withdrawing analytics does not limit calculator or form functionality.
 
-## Primární podklady (ověřováno 27. 10. 2026)
+## Cookies, storage, and analytics
 
-- [EDPB: právní základy](https://www.edpb.europa.eu/sme/be-compliant/process-personal-data-lawfully_en), [práva a transparentnost](https://www.edpb.europa.eu/sme/be-compliant/respect-individuals-rights_en)
-- [ÚOOÚ: cookies a rozdíl mezi souhlasem s uložením a právním titulem](https://uoou.gov.cz/verejnost/qa-otazky-a-odpovedi/cookies)
-- [Resend DPA](https://resend.com/legal/dpa), [retence](https://resend.com/docs/knowledge-base/account-quotas-and-limits#data-retention)
-- [Cloudflare Turnstile Privacy Addendum](https://www.cloudflare.com/turnstile-privacy-policy/), [pre-clearance](https://developers.cloudflare.com/turnstile/additional-configuration/hostname-management/pre-clearance/)
-- [Vercel DPA](https://vercel.com/legal/dpa), [Privacy Notice](https://vercel.com/legal/privacy-notice)
+Application code does not use contact data in cookies or browser storage. Analytics denial is stored for at most 180 days; permission remains only in current-document memory and must be granted again after reload. This conservative design prevents a historical stored grant from silently restoring measurement.
 
-Veřejné podklady nevydáváme za potvrzení smluv či nastavení konkrétních účtů.
+Before consent, no Umami tracker or history queue is created. Withdrawal closes the synchronous gate and discards pending analytics. Same-origin tabs receive only a constant denial signal where storage events or BroadcastChannel are available. No grant, campaign data, personal data, or visitor identifier is synchronized.
 
-## Dodatek: dobrovolná analytika — 27. 10. 2026
+Umami receives only allowlisted events and campaign properties, never email addresses, investment values, UUIDs, or Turnstile tokens. The tracker and network still expose technical metadata such as IP address and User-Agent, and Umami derives identifiers. The application therefore does not claim complete anonymity.
 
-Původní audit výše zůstává historickým záznamem. Nový kód přidává Umami Cloud až po dobrovolném opt-in; právním základem analytiky je souhlas, nikoli tvrzení o výjimce ze souhlasu. Kalkulačka a doručení nejsou podmíněné. Preference (verze, volba, čas) v localStorage na 180 dní má výhradně účel respektování rozhodnutí. Před souhlasem žádný Umami tracker ani fronta historie; odvolání zavře synchronní filtr a obnoví dokument. Žádosti dříve odeslané nelze zpětně zrušit. Blokované storage je ošetřeno i proti obnovení staršího souhlasu při reloadu pomocí fragmentu analytics-off.
+The owner reported an EU Umami region and Hobby plan. Public information describes six months of production-data retention plus separate backup cycles. EU storage does not guarantee that CDN, support, security, and operational logs remain exclusively inside the EEA. The applicable agreement, subprocessors, transfers, and safeguards remain the controller's responsibility.
 
-Návštěvnický souhlas se neslučuje se zasláním materiálu, newsletterem ani Hlídačem. E-mailové endpointy/validace/Resend/Turnstile se nemění. Umami dostává jen whitelist událostí a kampaní, nikoli adresu, částky nebo token. Aktuální tracker přesto čte browser metadata/localStorage preference a síť zpřístupňuje IP/UA; používá také paměťový x-umami-cache. Naše sanitizace odstraní výchozí screen/language/id a neužívá identify ani vlastní ID. Bez tvrzení úplné anonymity. Globální meta referrer=no-referrer omezuje HTTP Referer; skutečné produkční požadavky je potřeba zkontrolovat po schváleném nasazení.
+See [analytics.md](analytics.md) for the exact technical configuration and testing boundaries.
 
-Vlastník potvrdil EU region a tarif Hobby. Veřejné podklady uvádějí šest měsíců produkční retence a oddělené zálohy; EU storage není zárukou, že CDN/podpora/logy nepřesáhnou EHP. Umami DPA je součástí podmínek hostované služby; použitelné znění, podprocesory, mechanismy přenosu a případná doplňující opatření zůstávají odpovědností správce. Souhlas neopravuje případné chybějící smluvní záruky. Dřívější otevřené body Resend/Turnstile/Vercel Hobby a retence provozních dat tím nejsou uzavřeny. Hosting Vercel Hobby je již vlastníkem potvrzený, což aktualizovaná veřejná stránka zohledňuje.
+## Providers
 
-Přesná technická konfigurace, primární odkazy a podmínky ověření jsou v [analytics.md](analytics.md). Žádné výsledky reálného měření ani definitivní právní posouzení nebyly vytvořeny.
+### Resend
 
-## Opravy po read-only auditu Umami — 27. 10. 2026
+For an approved request, Resend receives the recipient, subject, HTML and text content, and, for the guide, a PDF attachment. The report contains the scenario and modeled results. Rejected demo recipients are not passed to Resend.
 
-Tento dodatek nahrazuje starší popis persistentního povolení a fragmentového fallbacku výše. Trvale se ukládá pouze odmítnutí na nejvýše 180 dní; po expiraci se při čtení podle možností odstraní. Povolení je pouze v paměti aktuálního dokumentu, platí i při klientské navigaci, ale nové načtení/reload/BFCache návrat vyžadují nové potvrzení. Starší uložené granted záznamy se nikdy neobnovují. Při výpadku zápisu odmítnutí zůstává gate vypnutý v aktuálním dokumentu a UI oznámí chybu; nevynucuje se reload, který by skryl upozornění. Při úspěšné persistenci může reload odstranit vendor runtime.
+The operator must verify the account's applicable terms, DPA, retention, open/click tracking, subprocessors, and transfer mechanism. Application-level absence of a contact database does not mean that Resend retains no recipient or content data.
 
-BroadcastChannel předává jen konstantní zprávu denied mezi kartami stejného originu a doplňuje storage události. Nepřenáší grant, kampaň, osobní údaje ani návštěvnický identifikátor. Izolované karty při blokaci obou kanálů a zápisu nelze spolehlivě okamžitě informovat; musí být odvolány zvlášť nebo zavřeny. Žádná nová stránka však nesmí automaticky obnovit staré povolení.
+### Cloudflare Turnstile
 
-Atribuce zůstává jen v paměti až po souhlasu. Dokončení starého POST se po změně vstupu zahodí; konverze neputuje k jiné kampani. Žádné nové údaje v serverových API ani analytické identifikátory. Fokus se nejprve podrží do potvrzení skutečné viditelnosti observerem. Dřívější smluvní a právní otevřené otázky zůstávají beze změny. Detailní limity a testy: docs/analytics.md.
+Turnstile processes technical browser and network signals for bot protection. The server submits the response token for verification but does not attach the email or investment scenario. The operator must verify widget mode, pre-clearance, account terms, retention, and Cloudflare's stated purposes.
 
+### Vercel
 
-## Aktualizace idempotence a diagnostiky — 28. 10. 2026
+Vercel hosts both the public pages and server endpoints. It therefore processes requests containing form data and operational metadata. The applicable Hobby-plan contractual coverage, regions, logs, retention, and provider role remain open questions.
 
-Nahrazuje dřívější popis obsahového HMAC a absence aplikačních logů: formulář nyní vytvoří UUID jedné žádosti, držené jen v paměti se snímkem příjemce a případného scénáře. Server je validuje a odvodí materiálově oddělený HMAC klíč Resendu. Není to návštěvnické ID a neposílá se do Umami ani aplikačních diagnostických logů. Provider nadále dostává příjemce i obsah pro doručení; při retry porovnává shodu celého payloadu. Server loguje výhradně allowlist material/phase/code/providerStatus, bez osobních údajů, tokenů a klíčů. Infrastruktura může mít vlastní logy; jejich retence zůstává k ověření. Nezměněna souhlasová lišta ani právní základ analytiky. Podrobnosti a hranice: email-delivery.md.
+### Umami
 
-Cílená oprava P2 dne 28. 10. 2026 přidává do odpovědí API jen pevné veřejné instrukce input_rejected/request_pending/request_conflict, nikoli interní diagnostiku. Stav uncertain a blokace konfliktu zůstávají pouze v paměti žádosti a neposílají se do Umami. Bez nových osobních údajů nebo úložišť. Diagnostické kategorie nově rozlišují neplatný JSON od neočekávané struktury a zahrnují i čtení těla odpovědi.
+Umami is loaded only after opt-in and receives a strictly filtered event payload. It still processes network metadata and derived identifiers. Consent for analytics does not repair missing contractual or transfer safeguards for Umami or any other provider.
+
+## Retention and rights
+
+The application creates no database of form contacts. The recipient allowlist remains in private server configuration. A logical request snapshot is held only in the open form's memory and is lost on reload or closure. Application diagnostics exclude request contents and identifiers, but provider and infrastructure retention remains separate.
+
+The operator must define real retention periods or criteria and deletion procedures for provider data, operational logs, the test-recipient list, and correspondence concerning rights. The public privacy page explains rights of access, correction, deletion, restriction, objection, portability where applicable, withdrawal where consent applies, and complaint to the Czech Office for Personal Data Protection.
+
+## Required owner follow-up
+
+1. Keep `PRIVACY_CONTACT_EMAIL` configured in production and maintain a real procedure for handling requests.
+2. Determine and document the legal bases for delivery, recipient restriction, and form protection.
+3. Verify the actual Resend terms, DPA, retention, tracking, subprocessors, and transfers.
+4. Verify Cloudflare Turnstile settings, pre-clearance, retention, and contractual roles.
+5. Confirm the Vercel project plan, applicable agreement, regions, logs, and retention; choose a suitable plan or provider if Hobby coverage is insufficient.
+6. Identify relevant subprocessors, processing countries, and safeguards for transfers outside the EEA.
+7. Define retention and deletion criteria for all provider and operational data.
+8. Audit production cookies, storage, network requests, widgets, hosting additions, and email tracking after material changes.
+9. Update the public privacy-page date whenever the processing description changes materially.
+
+Until these points are resolved, the project should remain a restricted non-commercial demo rather than be represented as legally production-ready for public financial or marketing use.
+
+## Primary sources
+
+Reviewed on 27 October 2026:
+
+- [EDPB: lawful processing](https://www.edpb.europa.eu/sme/be-compliant/process-personal-data-lawfully_en) and [individual rights](https://www.edpb.europa.eu/sme/be-compliant/respect-individuals-rights_en)
+- [Czech DPA: cookies and legal-basis distinction](https://uoou.gov.cz/verejnost/qa-otazky-a-odpovedi/cookies)
+- [Resend DPA](https://resend.com/legal/dpa) and [retention documentation](https://resend.com/docs/knowledge-base/account-quotas-and-limits#data-retention)
+- [Cloudflare Turnstile Privacy Addendum](https://www.cloudflare.com/turnstile-privacy-policy/) and [pre-clearance documentation](https://developers.cloudflare.com/turnstile/additional-configuration/hostname-management/pre-clearance/)
+- [Vercel DPA](https://vercel.com/legal/dpa) and [Privacy Notice](https://vercel.com/legal/privacy-notice)
+
+Public provider documents are references, not confirmation of the agreements or settings attached to a specific account.

@@ -1,175 +1,162 @@
 # ETF Kompas
 
-Konverzní landing page pro českého drobného investora, který přichází z mobilní reklamy a během několika sekund potřebuje pochopit rozdíly v nákladovosti ETF. Praktické zadání **B** pro výběrové řízení Junior AI Developer ve společnosti Clientelo.
+ETF Kompas is a responsive educational web application that compares the modeled long-term impact of different ETF expense ratios. It helps Czech retail investors explore a concrete investment scenario, compare selected S&P 500 ETFs, and understand how costs may affect the final value over time.
 
-**[Otevřít živou aplikaci](https://etf-kompas-zeta.vercel.app/)** · Next.js 16, React, TypeScript, Tailwind CSS · bezplatný hosting Vercel Hobby.
+The application is available in Czech and runs as a public, non-commercial portfolio demo.
 
-**Demonstrační režim:** kalkulačka je veřejná, HTML report a PDF průvodce se skutečně odesílají přes Resend pouze předem schváleným testovacím příjemcům. Nepovolená adresa není předána Resendu. Projekt není právně schválenou veřejnou službou; reklamní kampaně neproběhly a nejsou k dispozici naměřené konverzní výsledky z kampaní.
+**[Open the live application](https://etf-kompas-zeta.vercel.app/)** · **[Privacy information](https://etf-kompas-zeta.vercel.app/ochrana-osobnich-udaju)**
 
-## Rychlé vyzkoušení
+![ETF Kompas landing page and calculator](docs/screenshots/etf-kompas-hero.png)
 
-1. Otevřete web, změňte měsíční vklad, horizont nebo předpokládaný hrubý výnos a porovnejte dvě ETF. Kalkulačka funguje bez e-mailu i bez analytického souhlasu.
-2. Rozbalte roční průběh a metodiku; u fondů najdete odkazy na zdroje emitentů.
-3. Přes úvodní odkazy přejděte k reportu nebo průvodci. Skutečné doručení lze ověřit jen schválenou testovací adresou po Turnstile ověření. Zpráva o přijetí není potvrzením doručení do schránky.
+## Overview
 
-## Cílová skupina a konverzní strategie
+ETF Kompas was originally created as a practical assignment during a developer recruitment process and was subsequently refined into an independent portfolio project.
 
-Cílíme na české začínající drobné investory: část už zná ETF a řeší poplatky, část potřebuje nejprve srozumitelné vysvětlení. Americká ETF slouží ke vzdělávacímu porovnání, nikoli jako doporučení k nákupu; jejich dostupnost českému retailu omezuje PRIIPs/KID.
+The application demonstrates more than a client-side calculator. It combines a responsive React interface, a deterministic investment model, server-side validation and recalculation, protected email delivery, consent-based analytics, privacy documentation, and automated tests.
 
-Pořadí odpovídá návštěvě z mobilní reklamy:
+It is an educational comparison tool, not investment advice. The calculations use illustrative assumptions and do not predict future returns.
 
-1. **Úvod, nabídka obou materiálů a okamžitý výsledek.** Nadpis navazuje na rozdíl poplatků, přímé odkazy zpřístupňují i průvodce. Modelové předpoklady jsou u výsledku, aby číslo nebylo bez kontextu.
-2. **Nastavení investice a výběr ETF.** Návštěvník si výsledek přizpůsobí; nemusí nejprve vyplňovat vstupy, aby poznal hodnotu stránky. Desktop zachovává dva sloupce, mobil stejnou posloupnost obsahu.
-3. **Nabídka personalizovaného reportu.** O kontakt žádáme po ukázce konkrétního výsledku a vysvětlení obsahu reportu; následuje rozbalovací metodika.
-4. **Fondy a zdroje, potom samostatný průvodce.** Zdroje podporují důvěryhodnost, průvodce nabízí vzdělávací cestu i bez změny kalkulačky. Závěr obsahuje rizika, dostupnost ETF, informace o soukromí a patičku.
+## Key features
 
-Formuláře mají jediné povinné viditelné pole: e-mail. Turnstile je povinná bezpečnostní kontrola. Obě nabídky jsou na stránce dostupné všem, doručování je však omezené demonstračním režimem. Nevzniká automatický newsletter ani ETF Hlídač.
+- comparison of four S&P 500 ETFs: SPY, SPYM, VOO, and IVV;
+- adjustable monthly contribution, investment horizon, and expected gross annual return;
+- immediate comparison of modeled final values and cost impact;
+- expandable annual results and calculation methodology;
+- ETF data linked to official issuer sources;
+- personalized HTML report sent by email;
+- seven-page PDF guide for ETF beginners;
+- responsive desktop and mobile interface;
+- Czech privacy information and clear risk disclosures;
+- optional Umami analytics loaded only after explicit consent.
 
-## Dvě reklamní varianty
+## Screenshots
 
-Obě reklamy vedou na totožnou stránku. Testoval by se příslib reklamy, nikoli dvě verze webu; kampaně nebyly spuštěny.
+### Calculator and results
 
-| | A — Úspora na poplatcích | B — Jednoduchý začátek |
-| --- | --- | --- |
-| Nadpis | Stejný index. Různé poplatky. Kolik vás stojí rozdíl? | Chcete investovat do ETF, ale nevíte, který vybrat? |
-| Text | Dva ETF fondy mohou sledovat stejný index, ale mít rozdílné náklady. Spočítejte si, jak se mohou projevit za 20 let. | Porovnejte čtyři známé ETF, pochopte rozdíly a získejte zdarma průvodce pro začátečníky. |
-| CTA | Spočítat rozdíl zdarma | Porovnat ETF zdarma |
-| Cílový odkaz | [Varianta A](https://etf-kompas-zeta.vercel.app/?utm_content=ad_a) | [Varianta B](https://etf-kompas-zeta.vercel.app/?utm_content=ad_b) |
+![ETF comparison calculator and modeled results](docs/screenshots/etf-kompas-calculator.png)
 
-A navazuje na modelovaný dopad nákladovosti a report, B na srozumitelné porovnání a průvodce. `utm_content` je vstupní URL parametr; `ad_variant=ad_a/ad_b/unknown` je odvozená vlastnost analytické události, nikoli vstupní parametr. Podrobný [reklamní a konverzní plán](docs/ads-and-conversions.md) obsahuje pravidla férového porovnání.
+### Email materials
 
-## Kalkulačka, data a materiály
+![Personalized report and ETF guide forms](docs/screenshots/etf-kompas-materials.png)
 
-- **Čtyři ETF:** SPY, SPYM (dříve SPLG), VOO a IVV; S&P 500, NYSE Arca. Ruční snímek nákladovosti ověřený 26. 10. 2026: 0,0945 %, 0,02 %, 0,03 % a 0,03 % ročně. Zdroje State Street, Vanguard a iShares/BlackRock, role správců a data podkladů jsou v [katalogu](src/data/etfs.ts) a [dokumentaci dat](docs/etf-data-and-model.md). Nejde o živý feed ani o nové ověření sazeb při každém buildu.
-- **Čistý model:** [modelInvestment / compareInvestments](src/lib/investment.ts) začíná od nuly, oba fondy mají stejný hrubý výnos. Měsíční faktor je `((1 + g) × (1 − f))^(1/12)`; nejprve růst, potom vklad na konci měsíce. Výnosy se reinvestují. Výchozích 5 000 Kč měsíčně, 20 let a 7 % je ilustrativní předpoklad. Rozdíl konečných hodnot není součet skutečně zaplacených poplatků. Model nezahrnuje daně, inflaci, kurzové změny ani náklady brokera a negarantuje výnos.
-- **Primární lead magnet:** personalizovaný HTML report s textovou alternativou, ročním přehledem, nákladovostí, metodikou a zdroji. Server přepočítá validované vstupy stejným modelem; nepřebírá klientské výsledky.
-- **Sekundární lead magnet:** sedmistránkové PDF „ETF od nuly: 7 věcí, které byste měli vědět před první investicí“ s příklady, riziky a zdroji, zaslané jako příloha. [Hotové PDF](output/pdf/etf-od-nuly.pdf) je verzované mimo `public/` a build je přibalí do serverové funkce; produkce Python nepotřebuje. Případné zveřejnění repozitáře zpřístupní i PDF.
+### Mobile layout
 
-## Měření a vyhodnocení
+<img src="docs/screenshots/etf-kompas-mobile.png" alt="ETF Kompas mobile layout" width="390">
 
-Umami Cloud se načte pouze po dobrovolném souhlasu a jen v povolené produkci. Localhost a preview události neposílají. Odmítnutí neomezuje používání aplikace. Povolení platí v aktuálním dokumentu; po reloadu je nutné nové potvrzení. Odmítnutí se pamatuje nejvýše 180 dní. Nastavení je pod patičkou; odvolání ihned zastaví další měření a při úspěšném uložení odmítnutí obnoví stránku. Aktivity před souhlasem se zpětně neposílají.
+## Technology stack
 
-| Událost | Význam |
-| --- | --- |
-| `landing_view` | První měřený vstup na landing page |
-| `calculator_change` | Dokončená platná změna parametru na blur, bez hodnoty |
-| `etf_change` | Skutečná změna vybraného ETF |
-| `form_view` | Observer potvrdil alespoň 10 % formuláře ve viewportu |
-| `form_start` | První focus/pointer interakce, emitovaná až po `form_view` |
-| `form_submit` | Pokus po klientské validaci těsně před POST |
-| `material_accepted` | HTTP 202 a `status=accepted` po potvrzení Resendem |
-| `form_error` | Obecná kategorie neúspěchu, bez interních podrobností |
+### Application
 
-Hlavní funnel: **landing_view → form_view → form_start → form_submit → material_accepted**, zvlášť `report` a `guide`. Změna kalkulačky je volitelná. Demo odmítnutí není běžná validační chyba ani konverze. Jeden pageview a vlastní `landing_view` se nesčítají jako dvě návštěvy.
+- Next.js 16 with the App Router
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- Node.js server-side route handlers
 
-Do analytiky neposíláme e-maily ani jejich hashe, investiční hodnoty, UUID žádostí, tokeny či libovolné URL parametry. Používáme whitelist událostí a kampaní. Umami přesto zpracovává síťová metadata a odvozené identifikátory; nejde o zcela anonymní měření.
+### Services and deployment
 
-**Implementované události nejsou důkazem ověřeného dashboardu:** filtry variant na celé cestě, materiálové filtry jednotlivých kroků a jednotku deduplikace je nutné potvrdit v účtu Umami. Globální filtr `material` by mohl odstranit společný `landing_view`. Přijetí není doručení, unikátní kontakt ani vždy nový e-mail; idempotentní retry může vrátit původní potvrzení. Prostý poměr počtů událostí není návštěvnický konverzní poměr. Měření zahrnuje pouze souhlasící, neblokované a technicky zaznamenané aktivity. Podrobnosti: [analytika](docs/analytics.md).
+- Vercel for hosting and server functions
+- Resend for transactional email delivery
+- Cloudflare Turnstile for form protection
+- Umami Cloud for consent-based analytics
 
-### Pracovní cíl a další experimenty
+### Development and verification
 
-**5 % je pracovní hypotéza**, nikoli naměřený výsledek, benchmark nebo příslib. Znamená podíl měřených účastníků s alespoň jedním `material_accepted`, se stejnou jednotkou a obdobím v čitateli i jmenovateli. Předpokládá relevantní publikum, užitečný bezplatný materiál a běžně dostupné doručování. Současný allowlist neumožňuje tento cíl ověřit na běžném reklamním publiku.
+- Node.js built-in test runner
+- ESLint
+- TypeScript static checking
+- Git and GitHub
 
-Tři budoucí experimenty, seřazené podle odhadovaného dopadu; nebyly realizované:
+## How it works
 
-| Priorita | Test a důvod | Hlavní metrika | Hypotéza |
-| --- | --- | --- | --- |
-| P1 | Současný nadpis vs. stručnější vysvětlení stejného indexu a modelovaného rozdílu; rychlejší pochopení na mobilu | Celkový CR `landing_view → material_accepted` | Srozumitelnější sdělení zvýší CR |
-| P2 | Odstavec o reportu vs. tříbodový výčet ročního přehledu, nákladovosti a předpokladů u CTA | CR `form_view → material_accepted` pro report | Konkrétnější hodnota zvýší reportový CR |
-| P3 | Představení průvodce vs. čitelná ukázka skutečného obsahu | CR `form_view → material_accepted` pro guide | Ukázka sníží nejistotu a zvýší průvodcový CR |
+The calculator applies the same gross return assumption to both selected funds so that the modeled difference is caused only by their expense ratios. Contributions are added monthly, returns are reinvested, and the application produces annual data points for the selected horizon.
 
-Porovnávat stejné publikum, období a podmínky; hlídat celkový CR, chyby, rychlost a přístupnost. Součet konverzí obou materiálů není počet různých lidí. Bez skutečné kampaně a nákladů nelze určit vítěze ani cenu za kontakt.
+The browser displays the calculation immediately. When a user requests a personalized report, the server validates the submitted scenario and recalculates the result independently instead of trusting client-generated values.
 
-## Připravenost na spuštění reklamní kampaně
+ETF expense ratios are maintained as a manually verified snapshot, not a live market-data feed. The current dataset records its source and verification date for every fund.
 
-**ETF Kompas má funkční a otestovaný základ pro spuštění reálné reklamní kampaně.** Landing page je veřejně dostupná, responzivní a její hlavní konverzní scénáře – výpočet, e-mailový report i PDF průvodce – byly úspěšně ověřeny v produkčním prostředí.
+## Email delivery and security
 
-Aplikace je aktuálně provozována v demonstračním režimu. K přechodu na veřejný komerční provoz zbývá vyřešit především tři oblasti, které vyžadují rozhodnutí nebo součinnost zadavatele:
+Both email flows use the same protected server-side delivery pipeline. The implementation includes:
 
-| Oblast | Co je potřeba dořešit a proč |
-| --- | --- |
-| **Hosting** | Aplikace běží na bezplatném tarifu Vercel Hobby v souladu se zadáním. Tento tarif je určen pro osobní a nekomerční použití, proto je pro reálnou komerční kampaň nutné přejít na odpovídající tarif nebo zvolit jiné vhodné hostingové řešení. |
-| **Odesílání e-mailů** | V současnosti mohou e-maily přijímat pouze předem schválené adresy. Omezení je záměrné z důvodu ochrany osobních údajů, bezpečnosti demonstračního provozu a prevence zneužití. Před veřejným spuštěním je nutné zajistit odpovídající právní a provozní podmínky a bezpečné doručování bez omezení na předem schválené příjemce. |
-| **Právní a obchodní náležitosti** | Zadavatel musí potvrdit podmínky zpracování osobních údajů, související smluvní a přenosové podmínky poskytovatelů a schválit obsah finanční a reklamní komunikace. Některé otevřené otázky se týkají již současného dema. |
+- strict request and scenario validation;
+- exact origin checks;
+- Cloudflare Turnstile verification;
+- a honeypot field;
+- request size and content-type limits;
+- request identity and provider idempotency;
+- safe public error responses and restricted diagnostics;
+- server-side recipient allowlisting;
+- no email addresses, request bodies, tokens, or request IDs in application logs.
 
-### Proč tyto kroky nejsou součástí dema?
+The project does not create a contact database, newsletter subscription, or marketing list.
 
-Cílem praktického zadání bylo vytvořit funkční aplikaci na bezplatném hostingu a předvést její reálné fungování.
+## Demo limitations
 
-Proto jsem se zaměřil na dokončení a ověření hlavních funkcí, uživatelského prostředí a konverzních scénářů. Současně jsem ponechal omezení, která brání nekontrolovanému veřejnému využívání demonstrační služby.
+The calculator is publicly available, but email delivery is intentionally restricted to two pre-approved test recipients. Requests for any other address are rejected before the material is prepared or passed to Resend.
 
-Přechod na komerční hosting, schválení právních podmínek a nastavení pravidel veřejného doručování vyžadují součinnost zadavatele.
+The project is not a legally approved public financial service, and no advertising campaign has been run. Analytics events and conversion scenarios demonstrate the technical implementation; they are not evidence of measured campaign performance.
 
-**Shrnutí:** ETF Kompas je funkční, veřejně dostupná aplikace s ověřenými konverzními scénáři. Po vyřešení uvedených podmínek a závěrečném ověření produkční konfigurace může být využita pro skutečnou reklamní kampaň.
+Before any broader or commercial use, the hosting plan, public email delivery, provider agreements, retention rules, privacy assessment, and financial communication would require a separate review.
 
-Podrobnosti o současném provozu a otevřených otázkách jsou uvedeny v sekci „Omezení dema a soukromí“ a v dokumentu [technická revize soukromí](docs/privacy-review.md).
+## Local development
 
-## Lokální spuštění a konfigurace
+### Requirements
 
-Node.js **24.12+**, npm a Git. Po klonování repozitáře v jeho kořeni:
+- Node.js 24.12 or newer
+- npm
+- Git
+
+Install dependencies and start the development server:
 
 ```powershell
 npm ci
 npm run dev -- --webpack
 ```
 
-Otevřete [http://localhost:3000](http://localhost:3000). Kalkulačka funguje i bez konfigurace poskytovatelů; doručování bez úplné konfigurace zůstane bezpečně nedostupné. Webpack je ověřená alternativa k lokálnímu problému Turbopack CSS procesu; výchozí skripty stále používají `next dev` / `next build`.
+Open [http://localhost:3000](http://localhost:3000).
 
-Pro doručování nastavte v ignorovaném `.env.local` nebo v serverovém prostředí hostingu následující položky. Skutečné klíče ani schválené adresy nevkládejte do repozitáře, veřejné dokumentace nebo logů.
+The calculator works without external service configuration. Email delivery remains safely unavailable until all required environment variables are provided in `.env.local` or in the server environment:
 
-| Proměnná | Účel |
-| --- | --- |
-| `RESEND_API_KEY` | Tajný serverový klíč Resend |
-| `RESEND_FROM_EMAIL` | Odesílatel na ověřené projektové doméně; současný kód vyžaduje `etf.michalwebdeveloper.cz` |
-| `TURNSTILE_SECRET_KEY` | Tajný serverový klíč Siteverify |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Veřejný site key widgetu, nikoli tajemství |
-| `APP_ORIGIN` | Přesný origin bez cesty, lokálně např. `http://localhost:3000` |
-| `DEMO_ALLOWED_EMAILS` | Pouze serverový seznam přesně dvou různých platných testovacích adres oddělených čárkou; žádné wildcardy |
-| `PRIVACY_CONTACT_EMAIL` | Samostatný veřejný kontakt na stránce soukromí; není odesílatelem ani tajemstvím |
+```env
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=
+TURNSTILE_SECRET_KEY=
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=
+APP_ORIGIN=http://localhost:3000
+DEMO_ALLOWED_EMAILS=first@example.com,second@example.com
+PRIVACY_CONTACT_EMAIL=
+```
 
-`localhost` a `127.0.0.1` nejsou pro kontrolu originu zaměnitelné. Turnstile musí povolit používaný hostname; veřejné bypass testovací klíče neaktivují skutečné doručování. Dostupnost formulářů, site key a kontakt se připravují při buildu: po změně konfigurace restartovat dev server nebo vytvořit nový produkční build. Produkční proměnné se nastavují samostatně na hostingu. Žádný Umami API klíč není potřeba.
+Never commit real credentials or approved recipient addresses. The two demo recipient addresses must be valid and different.
 
-## Kontroly a jejich hranice
+## Verification
+
+Run the automated checks with:
 
 ```powershell
 npm test
 npm run lint
 npx tsc --noEmit --incremental false
 npm run build -- --webpack
-npm run start
 ```
 
-Poslední ověření aplikačního commitu `bcafdc1` dne 28. 10. 2026: **120/120 testů, ESLint, TypeScript, produkční Webpack build a `git diff --check` prošly**. Test skutečného Umami scriptu tehdy běžel v izolované VM s mockovanou sítí. Při běžném `npm test` se tento jeden test bez dočasného souboru určeného přes `UMAMI_TRACKER_TEST_FILE` přeskočí; návod je v [analytické dokumentaci](docs/analytics.md).
+Tests use mock configuration and mocked providers. They do not read `.env.local`, send real email, or transmit analytics events. The suite covers the investment model, validation, server-side recalculation, recipient restrictions, Turnstile integration contracts, idempotency, privacy rendering, consent behavior, analytics filtering, and form states.
 
-Testy používají fake konfiguraci a mockované služby, nečtou `.env.local` a neposílají skutečné e-maily ani analytické události. Pokrývají model a nezávislý výpočet, validaci, serverový přepočet, allowlist, Turnstile kontrakt, idempotenci, diagnostiku a analytický souhlas/atribuci. Komponentové harnessy nejsou úplným browser E2E testem ani auditem všech e-mailových klientů. Historie obsahuje ruční mobilní a desktopové kontroly; vlastník potvrdil skutečné doručení obou materiálů i produkční odmítnutí nepovolené adresy. Nejde o výsledky kampaně ani o automatizovaný důkaz doručení každého dalšího e-mailu.
+The optional test against the real Umami tracker script is skipped unless a separately downloaded tracker fixture is explicitly supplied through `UMAMI_TRACKER_TEST_FILE`.
 
-V prostředí s místní certifikační autoritou byl Webpack build ověřen s PowerShell nastavením `$env:NODE_OPTIONS='--use-system-ca'`; TLS ověřování zůstává zapnuté. Python není potřeba pro testy, build ani doručování hotového PDF. Jeho volitelná regenerace přes [skript](scripts/build-etf-guide.py) vyžaduje ReportLab, pypdf a dostupné Windows fonty Arial/Georgia; skript není univerzální multiplatformní generátor.
+## Documentation
 
-## Práce s AI a lidské ověřování
+Detailed technical documentation:
 
-AI pomáhala s návrhem rozhraní, implementací, výpočty, testy, audity a dokumentací. Úkoly byly zadávány po malých etapách s omezeními: zdroje ETF nevymýšlet, tajemství nezveřejňovat, skutečné e-maily ani publikování nespouštět bez autorizace. Vlastník schvaloval návrhy a vizuální výsledek, ověřoval doručené materiály a rozhodoval o provozních omezeních; technické výstupy se kontrolovaly diffem, testy, buildem a lokálním prohlížečem.
+- [ETF data and calculation model](docs/etf-data-and-model.md)
+- [Email delivery and security](docs/email-delivery.md)
+- [Analytics](docs/analytics.md)
+- [Advertising and conversion plan](docs/ads-and-conversions.md)
+- [Technical privacy review](docs/privacy-review.md)
 
-Doložené chyby a rozhodnutí zahrnují:
+The [`ai-log`](ai-log/README.md) directory remains in its original language because it documents the historical AI-assisted development process, major decisions, verification steps, and the boundary between generated assistance and human review.
 
-- Inicializace druhého Turnstile widgetu: opraven společný loader a nezávislé instance, doplněny regrese.
-- Obnovení odvolaného analytického souhlasu při selhání storage: zvoleno konzervativní povolení jen v paměti dokumentu, testy odvolání a více karet.
-- Obsahová idempotence nerozlišovala novou žádost o stejný materiál: nahrazena UUID jedné logické žádosti, zachováním identity při nejistém výsledku a bezpečnou diagnostikou. Původní produkční HTTP 503 tím nebyla definitivně vysvětlena.
-- První validační HTTP 400 zamykala opravu údajů; timeout při čtení těla odpovědi byl chybně klasifikován. Obojí opraveno a pokryto regresními testy.
+## Project status
 
-Podklady, rozhodnutí, příkazy a hranice ověření jsou v [ai-log/](ai-log/README.md). Redigovaný autentický přepis 302 položek je již dostupný v [ai-log/exports/](ai-log/exports/README.md), včetně indexu zpráv a kontroly úplnosti. Pracovní souhrny jsou vedeny odděleně od autentického přepisu.
-
-## Omezení dema a soukromí
-
-Server kontroluje schváleného příjemce u obou endpointů před přípravou materiálu a voláním Resendu. Chybějící nebo neplatná konfigurace doručování blokuje. Zůstávají validace, honeypot, kontrola originu a velikosti, serverové Turnstile a idempotence. **Distribuovaný limit podle IP/adresy není implementován**; ochrany a kvóty poskytovatele nejsou jeho ekvivalentem. Retry po nejistém výsledku drží původní UUID, adresu a scénář jen v paměti formuláře; reload nebo jiná karta tuto identitu ztratí. Automatické retry není implementované.
-
-Aplikace nevytváří databázi kontaktů získaných z formulářů ani marketingový odběr. Osobní údaje přesto zpracovává aplikace, hosting, Turnstile, při schválené žádosti Resend a po souhlasu Umami. Resend deklaruje primární zpracování v USA; EU region Umami nezaručuje výhradně evropské zpracování všech provozních údajů.
-
-Otevřené právní základy některých činností, retence a smluvní/přenosové podmínky poskytovatelů, včetně použitelného ujednání pro Vercel Hobby, se týkají také **současného dema**. Omezení příjemců ani zveřejnění nedostatků je právně neřeší. Před skutečnou reklamou nebo veřejným získáváním kontaktů je nutné tyto otázky uzavřít a znovu posoudit rozšířený provoz. Podrobnosti: [veřejná stránka soukromí](https://etf-kompas-zeta.vercel.app/ochrana-osobnich-udaju) a [technická revize](docs/privacy-review.md).
-
-## Orientace v projektu
-
-- `src/app/`, `src/components/`: stránky, kalkulačka, formuláře, analytika a Turnstile.
-- `src/data/etfs.ts`, `src/lib/investment.ts`: datový katalog a čistý model.
-- `src/lib/email/`, `src/app/api/materials/`: validace, obsah a serverové doručování.
-- `tests/`: automatické testy; `output/pdf/`: verzovaná příloha; `scripts/`: její generátor.
-- [Data a metodika](docs/etf-data-and-model.md) · [Doručování a bezpečnost](docs/email-delivery.md) · [Analytika](docs/analytics.md) · [Reklamy a konverze](docs/ads-and-conversions.md) · [Revize soukromí](docs/privacy-review.md).
+ETF Kompas is a completed portfolio and learning project maintained as a public demonstration. Its calculation, protected demo delivery flows, and automated checks are functional; the limitations described above are intentional and should not be interpreted as production readiness for a public financial or marketing service.

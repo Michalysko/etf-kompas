@@ -20,9 +20,9 @@ export default function PrivacyPage() {
         <p className="eyebrow">OSOBNÍ DEMO / OCHRANA ÚDAJŮ</p>
         <h1>Soukromí v ETF Kompasu</h1>
         <p className="privacy-lead">E-mail pro jeden vyžádaný materiál. Žádný automatický marketing.</p>
-        <p>ETF Kompas je osobní nekomerční demonstrační projekt vytvořený výhradně pro výběrové řízení Clientelo. Kalkulačka je veřejně dostupná. HTML report a PDF průvodce se zasílají pouze předem schváleným testovacím příjemcům. Neprobíhají skutečné reklamní kampaně ani získávání kontaktů pro marketing.</p>
+        <p>ETF Kompas je osobní nekomerční demonstrační projekt vytvořený jako praktické zadání v rámci výběrového řízení na vývojářskou pozici. Kalkulačka je veřejně dostupná. HTML report a PDF průvodce se zasílají pouze předem schváleným testovacím příjemcům. Neprobíhají skutečné reklamní kampaně ani získávání kontaktů pro marketing.</p>
         <p>Také při demonstračním provozu dochází ke zpracování osobních údajů — při návštěvě webu, bezpečnostním ověření, odeslání formuláře nebo dobrovolně povolené analytice.</p>
-        <p className="small muted">Poslední aktualizace: <time dateTime={PRIVACY_UPDATED_ON}>28. 10. 2026</time></p>
+        <p className="small muted">Poslední aktualizace: <time dateTime={PRIVACY_UPDATED_ON}>1. 11. 2026</time></p>
       </div>
       <aside className="privacy-notice" aria-labelledby="privacy-draft-title">
         <h2 id="privacy-draft-title">Rozsah dema a otevřené podmínky</h2>
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
       </nav>
       <section id="spravce" className="privacy-block" aria-labelledby="spravce-title">
         <h2 id="spravce-title">1. Kdo je správcem a jak ho kontaktovat</h2>
-        <p>Správcem je <strong>{PRIVACY_CONTROLLER_NAME}</strong>, fyzická osoba provozující osobní nekomerční demo ETF Kompas. Společnost Clientelo je uvedena jako kontext výběrového řízení; tato stránka ji neoznačuje za správce údajů návštěvníků.</p>
+        <p>Správcem je <strong>{PRIVACY_CONTROLLER_NAME}</strong>, fyzická osoba provozující osobní nekomerční demo ETF Kompas. Zadavatel původního výběrového řízení není provozovatelem aplikace ani správcem údajů návštěvníků.</p>
         {contact ? <p>Veřejný kontakt pro dotazy a uplatnění práv: <a href={contact.href}>{contact.email}</a>.</p> : <p className="privacy-pending"><strong>K doplnění / ověření:</strong> veřejný kontaktní e-mail správce zatím není určen. Správce musí doplnit skutečnou adresu a ověřit její funkčnost před veřejným spuštěním.</p>}
       </section>
       <section id="ucely-a-zaklady" className="privacy-block" aria-labelledby="ucely-title">

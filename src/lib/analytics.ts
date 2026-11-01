@@ -21,9 +21,9 @@ export interface AnalyticsPayload {
 export interface AnalyticsLocation { href: string; pathname: string; referrer: string }
 export interface FormAttempt { material: Material; ordinal: number; epoch: number }
 const utmValues: Record<string, readonly string[]> = {
-  utm_source: ["meta", "facebook", "instagram", "google", "linkedin", "clientelo", "demo"],
+  utm_source: ["meta", "facebook", "instagram", "google", "linkedin", "demo"],
   utm_medium: ["paid_social", "cpc", "social", "referral", "demo"],
-  utm_campaign: ["clientelo_demo", "etf_kompas"], utm_content: ["ad_a", "ad_b"],
+  utm_campaign: ["etf_kompas_demo", "etf_kompas"], utm_content: ["ad_a", "ad_b"],
 };
 const referrers = new Set(["facebook.com", "www.facebook.com", "l.facebook.com", "m.facebook.com", "instagram.com", "www.instagram.com", "google.com", "www.google.com", "google.cz", "www.google.cz", "linkedin.com", "www.linkedin.com"]);
 

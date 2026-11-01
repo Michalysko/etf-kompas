@@ -1,134 +1,139 @@
-# Reklamní varianty A/B a vyhodnocení konverzí
+# A/B Advertising Variants and Conversion Evaluation
 
-Připraveno 28. 10. 2026 pro odevzdání náborového zadání Junior AI Developer, Clientelo. Základ auditu: commit `653798ec439a4323217943a47aafa8676bfbff20`. Reklamy nejsou spuštěné. Dokument neobsahuje výsledky kampaní. Obě varianty vedou na stejnou landing page; testuje se sdělení reklamy, nikoli dvě verze webu. Nabídky obou materiálů vidí všichni, ale současné demo doručuje pouze předem schváleným testovacím příjemcům. Kalkulačka je veřejná. Landing page ani měřicí kód nebyly tímto krokem změněny.
+Prepared on 28 October 2026 for a developer recruitment assignment and later retained as portfolio documentation. Audit baseline: commit `653798ec439a4323217943a47aafa8676bfbff20`.
 
-Současný allowlist záměrně omezuje konverze běžných návštěvníků. Níže uvedený plán a hypotéza 5 % se vztahují k případnému budoucímu, právně a provozně připravenému veřejnému doručování; nelze je ověřit na běžném reklamním publiku v nynějším demu. Otevřené otázky také současného provozu popisuje [revize soukromí](privacy-review.md).
+No advertisements have been launched and this document contains no campaign results. Both variants lead to the same landing page; the proposed experiment tests advertising language, not two different web applications. Both email offers are visible to everyone, but the current demo delivers only to pre-approved recipients. The calculator remains public.
 
-## 1. Schválená atribuce bez změny kódu
+The recipient allowlist prevents the current demo from measuring ordinary public conversions. The 5% target below is a future working hypothesis for a legally and operationally prepared public delivery flow, not a result or benchmark. Current privacy questions are described in the [technical privacy review](privacy-review.md).
 
-Vlastník 28. 10. 2026 schválil používání pouze stávajícího vstupního URL parametru `utm_content`. `src/lib/analytics.ts`, funkce `campaignContext`, z něj načte povolenou hodnotu a do pojmenovaných analytických událostí přidá vlastnost `ad_variant`. `utm_content` je tedy vstup v odkazu, zatímco `ad_variant` je výstupní vlastnost události; není to podporovaný vstupní parametr. Alias se nezavádí a žádná oprava kontroleru není pro schválené odkazy potřeba.
+## 1. Approved attribution contract
 
-| Schválený vstup při nové návštěvě | Vlastnost analytické události | Stav |
+The approved links use only the existing input parameter `utm_content`. `campaignContext` in `src/lib/analytics.ts` reads its allowlisted value and adds `ad_variant` to named analytics events. `utm_content` is the URL input; `ad_variant` is a derived event property, not a supported URL parameter.
+
+| New-entry URL | Analytics property | Status |
 | --- | --- | --- |
-| [Varianta A](https://etf-kompas-zeta.vercel.app/?utm_content=ad_a) | `ad_variant=ad_a` | Podporované |
-| [Varianta B](https://etf-kompas-zeta.vercel.app/?utm_content=ad_b) | `ad_variant=ad_b` | Podporované |
-| `/` bez rozpoznané varianty | `ad_variant=unknown` | Podporované |
+| [Variant A](https://etf-kompas-zeta.vercel.app/?utm_content=ad_a) | `ad_variant=ad_a` | Supported |
+| [Variant B](https://etf-kompas-zeta.vercel.app/?utm_content=ad_b) | `ad_variant=ad_b` | Supported |
+| `/` without a recognized variant | `ad_variant=unknown` | Supported |
 
-Při původním auditu bylo chování ověřeno skutečným kontrolerem s mockovaným transportem, bez produkčních požadavků. Parametr ad_variant v URL se ignoruje; do reklamních odkazů jej nevkládat. Výběr podporovaných UTM odkazů uzavírá dřívější nesoulad URL kontraktu bez změny aplikace. Zachování kontextu při interní navigaci je popsáno níže.
+This behavior was verified against the actual controller with a mocked transport. No production request was sent. The URL parameter `ad_variant` is ignored and must not be used in campaign links.
 
-## 2. Přesné reklamní texty
+## 2. Proposed advertising copy
 
-### Varianta A — Úspora na poplatcích
+The application targets Czech-speaking users, so the production ad copy remains in Czech.
 
-- **Nadpis:** Stejný index. Různé poplatky. Kolik vás stojí rozdíl?
+### Variant A — Expense-ratio impact
+
+- **Headline:** Stejný index. Různé poplatky. Kolik vás stojí rozdíl?
 - **Text:** Dva ETF fondy mohou sledovat stejný index, ale mít rozdílné náklady. Spočítejte si, jak se mohou projevit za 20 let.
 - **CTA:** Spočítat rozdíl zdarma
-- **Motivace:** finanční rozdíl způsobený náklady ETF, ověřený na vlastním modelovém scénáři. Nadpis nesmí být interpretován jako garantovaná úspora nebo příslib výnosu; landing page vysvětluje modelovaný rozdíl konečných hodnot.
-- **Navržená cílová skupina:** česky mluvící dospělí začínající drobní investoři, kteří již znají pojem ETF a chtějí porovnat průběžné náklady. Jde o návrh publika, nikoli tvrzení o spuštěném cílení nebo parametrech reklamní platformy.
-- **Schválená cílová URL:** https://etf-kompas-zeta.vercel.app/?utm_content=ad_a
-- **Směrová hypotéza:** A může zvýšit zájem o report; nabídka průvodce zůstává viditelná a přijaté žádosti se počítají i u něj, v mezích demonstračního omezení.
+- **Rationale:** emphasizes the modeled financial difference caused by ETF expenses. It must not be presented as guaranteed savings or return.
+- **Proposed audience:** Czech-speaking adult beginner retail investors who already recognize the term ETF and want to compare ongoing costs. This is an audience proposal, not proof of configured platform targeting.
+- **URL:** `https://etf-kompas-zeta.vercel.app/?utm_content=ad_a`
+- **Directional hypothesis:** Variant A may increase interest in the personalized report.
 
-### Varianta B — Jednoduchý začátek
+### Variant B — Beginner education
 
-- **Nadpis:** Chcete investovat do ETF, ale nevíte, který vybrat?
+- **Headline:** Chcete investovat do ETF, ale nevíte, který vybrat?
 - **Text:** Porovnejte čtyři známé ETF, pochopte rozdíly a získejte zdarma průvodce pro začátečníky.
 - **CTA:** Porovnat ETF zdarma
-- **Motivace:** srozumitelné porovnání a vzdělávání, bez potřeby zadávat e-mail pro základní výsledek.
-- **Navržená cílová skupina:** česky mluvící dospělí začátečníci se zájmem pochopit ETF. Pro samotné A/B srovnání použít stejné publikum jako u A; nesměšovat vliv sdělení s jiným cílením.
-- **Schválená cílová URL:** https://etf-kompas-zeta.vercel.app/?utm_content=ad_b
-- **Směrová hypotéza:** B může zvýšit zájem o průvodce; nabídka reportu zůstává viditelná a přijaté žádosti se počítají i u něj, v mezích demonstračního omezení.
+- **Rationale:** emphasizes understandable comparison and education; the basic result requires no email.
+- **Proposed audience:** Czech-speaking adult beginners who want to understand ETFs. A clean A/B comparison must use the same audience as Variant A.
+- **URL:** `https://etf-kompas-zeta.vercel.app/?utm_content=ad_b`
+- **Directional hypothesis:** Variant B may increase interest in the beginner guide.
 
-Schválené odkazy obsahují pouze utm_content. Nerozlišují jménem platformu, medium ani campaign; není správné z nich automaticky dovozovat Meta nebo placenou návštěvnost. Varianta se rozliší přes UTM Content a vlastnost ad_variant. Ostatní povolené UTM v knihovně zůstávají technickou možností, nikoli součástí těchto schválených reklamních odkazů.
+Both links contain only `utm_content`; they do not identify a platform, medium, or campaign name. Do not infer Meta or paid traffic from these URLs. Other UTM values remain technical possibilities in the library, not part of the approved links.
 
-## 3. Události a jejich skutečné pokrytí
+## 3. Event coverage
 
-Všech osm pojmenovaných událostí dostává `ad_variant=ad_a/ad_b/unknown`. Bez souhlasu nebo mimo povolenou produkci se nic neodesílá. Pro každou z obou materiálových cest byly hodnoty ověřeny v mock transportu.
+All eight named events receive `ad_variant=ad_a/ad_b/unknown`. Nothing is sent without consent or outside the allowed production environment.
 
-| Událost | Co skutečně znamená | Další informace a limity |
+| Event | Meaning | Important limit |
 | --- | --- | --- |
-| `landing_view` | První měřený vstup na `/` v daném vstupu kontroleru | Až po souhlasu; nejde o všechny příchody. Vedle ní jde jeden pageview bez názvu, nesčítat je. |
-| `calculator_change` | Dokončená platná změna parametru na blur | Posílá pouze název pole, ne částku/výnos/horizont. Výchozí hodnoty ani každá klávesa nejsou interakce. |
-| `etf_change` | Skutečná změna výběru ETF | Pouze povolený ticker a pozice; bez osobních údajů. |
-| `form_view` | Observer potvrdil alespoň 10 % formuláře ve viewportu | Jednou na materiál a měřený vstup; mount ani neviditelná sekce nestačí. |
-| `form_start` | První focus/pointer interakce s formulářem | Jednou na materiál, uvolní se až po `form_view`. Je to interakce, ne důkaz napsaného e-mailu. |
-| `form_submit` | Platný pokus o POST po klientské validaci a splnění podmínek odesílání | Ne pouhé kliknutí, ne samotné zobrazení Turnstile. `attempt=first/repeat` rozlišuje pokusy. |
-| `material_accepted` | Klient obdržel HTTP 202 a JSON `status=accepted` | Zachovává `material=report/guide`, `attempt` i variantu. Přijetí Resendem není doručení ani unikátní e-mail; retry může vrátit původní potvrzení. |
-| `form_error` | Obecná chyba pokusu nebo validace; demo odmítnutí se vynechává | `material`, kategorie validation/verification/busy/server/network; není důkaz chyby poskytovatele. |
+| `landing_view` | First measured entry to `/` | Occurs only after consent; not every arrival |
+| `calculator_change` | Valid parameter change completed on blur | Sends the field name, never the value |
+| `etf_change` | Real ETF selection change | Sends only allowlisted ticker and position |
+| `form_view` | At least 10% of a form visible | Once per material and measured entry |
+| `form_start` | First focus/pointer interaction | Interaction, not proof that an email was typed |
+| `form_submit` | Valid POST attempt after client checks | `attempt=first/repeat` distinguishes attempts |
+| `material_accepted` | HTTP 202 with `status=accepted` | Provider acceptance, not mailbox delivery or unique email |
+| `form_error` | General validation or attempt error | Demo-recipient rejection is intentionally excluded |
 
-Odpověď `demo_not_allowed` nevytváří `form_error` ani `material_accepted`; skutečný pokus po souhlasu zůstává `form_submit`. Zamítnutí příjemce tedy není běžnou validační chybou ani konverzí.
+`demo_not_allowed` creates neither `form_error` nor `material_accepted`; after consent, the real attempt remains `form_submit`.
 
-Formulářové události mají `material`, ale landing_view, calculator_change a etf_change jej nemají. **Globální filtr material=report/guide proto nesmí odstranit společné úvodní kroky funnelu.** Materiál je třeba filtrovat na odpovídajících krocích, pokud to konkrétní report umožňuje.
+Only form events contain `material`. A global `material=report/guide` filter must not remove shared introductory funnel steps. Payload allowlists exclude email addresses and hashes, investment values, portfolios, request UUIDs, idempotency keys, Turnstile tokens, and arbitrary query values. Umami still processes network metadata and derived identifiers; the data is not absolutely anonymous.
 
-Kampaň vzniká až po souhlasu a drží se v paměti dokumentu. Běžný SPA návrat `utm_content=ad_a → soukromí → /` zachová A. Holé `/` po této interní cestě není nová neznámá akvizice. Nový dokument bez kampaně je unknown; reload ruší souhlas a paměťový kontext, znovu se čte dostupná URL až po novém opt-in. Předchozí aktivity se neposílají zpětně. Nová explicitní kampaň změní kontext; dokončení starého čekajícího POST se analyticky vynechá místo přiřazení k jiné variantě. Kontext se nepřenáší mezi kartami nebo zařízeními.
+## 4. Funnel definition
 
-Payload i before-send používají allowlist: bez adres a jejich hashů, částek, výnosů, portfolia, UUID žádostí, idempotency klíčů, Turnstile tokenů nebo libovolných query. Umami přesto zpracovává síťová metadata a odvozené identifikátory podle [privacy-review.md](privacy-review.md); nelze tvrdit absolutní anonymitu.
+The full behavior path is:
 
-## 4. Přesná definice funnelu
+1. `landing_view`;
+2. optional `calculator_change` or `etf_change`;
+3. `form_view` for a material;
+4. `form_start` for the same material;
+5. `form_submit`;
+6. `material_accepted`.
 
-Požadovaná cesta uživatelského chování je:
+The **primary conversion funnel** is:
 
-1. `landing_view`.
-2. Volitelně interakce s kalkulačkou: `calculator_change` nebo `etf_change`.
-3. `form_view` pro zvolený materiál.
-4. `form_start` pro tentýž materiál.
-5. `form_submit` pro tentýž materiál.
-6. `material_accepted` pro tentýž materiál.
+```text
+landing_view → form_view → form_start → form_submit → material_accepted
+```
 
-**Hlavní konverzní funnel** je `landing_view → form_view → form_start → form_submit → material_accepted`, zvlášť pro report a guide. Krok kalkulačky není povinný: návštěvník může použít výchozí model nebo požádat o průvodce bez editace. Formulář může být navíc viditelný ještě před editací kalkulačky. Striktní šestikroková posloupnost by tak vyřadila platné konverze.
+Evaluate report and guide separately where per-step filtering is supported. Calculator interaction is optional because a visitor may use defaults or request the guide directly. A diagnostic funnel may insert `calculator_change`, but it must never be presented as all conversions.
 
-**Doplňkový diagnostický funnel** s calculator_change mezi landing a form_view lze sledovat pro tuto užší cestu, nikdy jej nepovažovat za všechny konverze. etf_change lze vyhodnotit odděleně; nepředpokládat podporu OR podmínek ve funnel kroku bez kontroly účtu. form_error je vedlejší diagnostika, nikoli povinný krok k úspěchu.
+The primary A/B metric is the proportion of measured report participants who progress from `landing_view` to at least one `material_accepted`, using the same period, attribution, window, and participant unit for numerator and denominator:
 
-**Hlavní metrika A/B:** podíl měřených účastníků analytického reportu, kteří od landing_view dosáhnou alespoň jednoho material_accepted pro kterýkoli materiál, ve stejném období, atribuci a časovém okně. Vzorec `CR_v = 100 × U_v(landing_view → material_accepted) / U_v(landing_view)`, kde `v` je ad_a nebo ad_b a `U` musí být v čitateli i jmenovateli stejná jednotka účastníka podle použitého Umami reportu. Jednotku a skutečné filtry je nutné potvrdit v dashboardu; není to vlastní identifikace lidí. Pro tento hlavní dvoukrokový konverzní pohled se povinně nevyžaduje pozorování všech mezikroků.
+```text
+CR_v = 100 × U_v(landing_view → material_accepted) / U_v(landing_view)
+```
 
-Vedlejší metriky: samostatný CR_report a CR_guide, propady jednotlivých kroků, aktivita kalkulačky a počet chyb/pokusů. Report+guide procenta nesčítat: stejný účastník může získat oba materiály. Hlavní pohled s koncem material_accepted bez filtru materiálu počítá jejich sjednocení podle reportu. Prostý součet material_accepted dělený počtem landing_view je jen poměr událostí; retry a návraty jej mohou zvýšit i nad 100 %, není to konverzní poměr návštěvníků.
+Here `v` is `ad_a` or `ad_b`, and `U` is the consistent unit supplied by the verified Umami report. Do not add report and guide percentages: one participant may request both. A raw event-count ratio is not a visitor conversion rate and may exceed 100% because of retries or repeat entries.
 
-## 5. Co lze ověřit v Umami a co zatím ne
+## 5. Dashboard verification limits
 
-Oficiální dokumentace potvrzuje sekvenční funnel z URL/událostí, UTM přehled a vlastnosti událostí. U funnelu je Window maximální doba **mezi po sobě jdoucími kroky**, nikoli nutně limit celé cesty. Navržené jednotné nastavení je 60 minut mezi kroky pro obě varianty a oba materiály.
+Umami documentation describes sequential funnels, UTM reports, and event properties. The Funnel Window limits time between adjacent steps, not necessarily the whole journey. A consistent 60-minute adjacent-step window is proposed.
 
-Vlastník potvrdil účet Hobby a sekce Events, Funnels, UTM; tento krok neotevíral přihlášený účet. **Neověřeno:** filtrování vlastnosti ad_variant v konkrétním funnelu, filtry material na jednotlivých krocích, jednotka deduplikace a přesné chování reportu při opakovaných vstupech. Nenazývat dvě samostatné tabulky počtů událostí spolehlivým sekvenčním funnelem.
+The owner confirmed a Hobby account with Events, Funnels, and UTM sections, but this review did not access the authenticated account. Still unverified:
 
-Postup ručního ověření po samostatném schválení:
+- filtering a funnel by `ad_variant`;
+- applying `material` only to relevant steps;
+- the deduplication unit;
+- behavior across repeated entries.
 
-1. Použít podporované UTM odkazy a ověřit po souhlasu Network payload bez citlivých údajů; žádné požadavky před souhlasem/po odmítnutí.
-2. V Events ověřit ad_variant u všech událostí a material u formulářových událostí. Nevyvolávat skutečný POST bez zvláštní autorizace vlastníka.
-3. V UTM ověřit utm_content. Vytvořit či zkontrolovat dva stejně nastavené konverzní pohledy A/B a zvlášť materiálové cesty. Tento dokument je návod, nastavení účtu nebylo provedeno.
-4. Ověřit, že varianta filtruje události celé cesty, nespojuje A start s B dokončením a že material filtr nemaže landing_view. Zkontrolovat deduplikaci opakovaných accepted podle skutečné jednotky reportu.
-5. Pokud požadované filtry nejsou dostupné, prezentovat Events/Properties a UTM Views jako omezený rozpad počtů a označit nemožnost ověřeného materiálového/A/B funnelu. Nevyvozovat návštěvnický CR z poměru nesourodých počtů. Případný jiný report/export řešit odděleně, bez přidání vlastních návštěvnických ID.
+If these filters are unavailable, present Events/Properties and UTM Views only as limited count breakdowns. Do not label separate tables as a verified sequential funnel or derive visitor conversion rates from incompatible totals.
 
-Bez přístupu k účtu nelze slíbit, že současný Hobby dashboard všechny kombinace filtrů skutečně poskytne. Na úrovni aplikace jsou potřebné varianty a typy materiálu přítomné při použití podporovaného parametru.
+## 6. Working conversion hypothesis
 
-## 6. Pracovní konverzní cíl — výslovně hypotéza
+The proposed target is **5% of measured conversion-report participants reaching at least one `material_accepted`**. It is not an achieved result, external benchmark, forecast, or promise.
 
-Navržený orientační cíl je **5 % měřených účastníků konverzního reportu s alespoň jedním material_accepted**. Není to dosažený výsledek, externí benchmark, předpověď ani příslib. Předpoklady: relevantní české publikum, shodná distribuce A/B, bezplatný užitečný materiál, přiměřeně rychlá mobilní stránka a funkční doručovací cesta. Pro demonstraci jde o zvolenou testovatelnou pracovní hranici, nikoli o statisticky odvozenou hodnotu.
+At 200 comparable measured participants per variant, 5% would equal 10 converting participants. This is arithmetic illustration only; it does not guarantee statistical power. A small or zero traffic sample must be reported as a limitation, never replaced with invented results.
 
-Pokud by bylo možné získat 200 srovnatelných měřených účastníků na variantu, 5 % by odpovídalo 10 konvertujícím účastníkům. To je pouze aritmetická ilustrace: takový vzorek ani 10 konverzí nezaručuje průkazný rozdíl A/B. Malý nebo nulový skutečný provoz do 30. 10. 2026 uvést jako omezení; nenahrazovat ho smyšlenými výsledky.
+Expected direction: A may produce a higher report conversion rate and B a higher guide conversion rate. No overall winner is predicted. Keep audience, placement, period, and budget equal, and randomize allocation if supported. Define duration and sample requirements before launch; do not stop after the first few conversions. Report numerator, denominator, percentage-point difference, and uncertainty. Without advertising cost data, cost per conversion and an economic winner cannot be determined.
 
-Očekávaný směr: A může mít vyšší CR_report, B vyšší CR_guide; předem neurčujeme vítěze celkového CR. Shodné publikum, umístění, období a rozpočet, náhodné rozdělení pokud jej platforma podporuje. Neprohlašovat dvě nerovnoměrně doručované reklamy za čistý randomizovaný experiment. Před spuštěním stanovit délku, potřebný vzorek podle pilotní míry a minimálního zajímavého rozdílu; nevypínat variantu po prvních několika konverzích. Uvést čitatele/jmenovatele, absolutní rozdíl procentních bodů a nejistotu, nikoli jen relativní procenta. Bez reklamních nákladů nelze určit cenu za konverzi ani ekonomického vítěze.
+## 7. Prioritized future hypotheses
 
-## 7. Tři prioritizované hypotézy další optimalizace landing page
+These are separate future experiments and must not run simultaneously with the advertising-message test.
 
-Jde o návrhy budoucích samostatných experimentů, žádná změna nebyla implementována. Nesměšovat je současně s testem reklamního sdělení.
+| Priority | Test | Primary metric | Hypothesis |
+| --- | --- | --- | --- |
+| P1 | Current headline vs. a shorter explanation of the same index and modeled expense difference | Overall `landing_view → material_accepted` rate | Faster mobile comprehension may improve conversion |
+| P2 | Current report paragraph vs. a three-point list: annual breakdown, expenses, assumptions | Report `form_view → material_accepted` rate | A more concrete offer may improve report conversion |
+| P3 | Current guide introduction vs. a readable preview of real guide content | Guide `form_view → material_accepted` rate | A preview may reduce uncertainty |
 
-| Priorita | Co testovat | Proč | Hlavní metrika | Očekávaný směr |
-| --- | --- | --- | --- | --- |
-| P1 | Současný nadpis versus stručnější vysvětlení stejného indexu a modelovaného rozdílu poplatků | Mobilní návštěvník musí rychle pochopit návaznost reklamy na výsledek; nezměnit model ani slibovat výnos | Celkový CR landing_view → material_accepted | Srozumitelnější vysvětlení může zvýšit CR a omezit odchody |
-| P2 | Současný odstavec o reportu versus tříbodový výčet stejného obsahu „roční přehled, nákladovost, předpoklady“ přímo u CTA | Zpřesnit hodnotu materiálu před zadáním e-mailu bez dalších povinných polí | Podíl účastníků form_view report → material_accepted report | Konkrétnější nabídka může zvýšit reportový CR |
-| P3 | Současné představení průvodce versus malá čitelná ukázka skutečné stránky/obsahu | Snížit nejistotu začátečníka, co po zadání adresy obdrží | Podíl účastníků form_view guide → material_accepted guide | Ukázka může zvýšit průvodcový CR; hlídat mobilní čitelnost a rychlost |
+Monitor overall conversion, general errors, speed, and accessibility as guardrails. Improvement to one material is not automatically improvement to the whole project.
 
-U všech sledovat i celkový CR obou materiálů, obecné chyby a přístupnost jako kontrolní metriky. Zlepšení jednoho materiálu nesmí být automaticky vydáno za zlepšení celého projektu.
+## 8. Consent and interpretation boundaries
 
-## 8. Souhlas a hranice interpretace
+Measurement includes only consenting, unblocked, technically recorded activity. Denial does not limit the application, and pre-consent actions are not backfilled. Permission lasts only in the current document; reload requires a new opt-in. Denial is remembered for at most 180 days.
 
-Měření pokrývá pouze souhlasící, neblokované a technicky zaznamenané aktivity. Odmítnutí nic neomezuje; žádné zpětné doplňování aktivit. Povolení platí jen v dokumentu, po reloadu je potřeba nový opt-in; odmítnutí se pamatuje nejvýše 180 dní. Bez souhlasu nevzniká analytický záznam, proto samotné Umami neurčí počet všech odmítnuvších nebo celkovou míru souhlasu. Z těchto dat nelze spolehlivě odvodit konverzní poměr všech reklamních kliknutí.
+Visit, unique visitor, pageview, custom `landing_view`, submission attempt, provider acceptance, and delivered email are different metrics. Umami uses derived identifiers, so one person may split into multiple records or multiple people may be merged. Consent and blocking rates may differ between variants. No measured values are reported in this document.
 
-Návštěva, unikátní návštěvník, pageview, vlastní landing_view, pokus a doručený e-mail nejsou zaměnitelné metriky. Umami používá odvozené identifikátory; jedna fyzická osoba se může rozdělit nebo více osob sloučit. Souhlas, blokování a výpadky mohou mít jinou četnost v každé variantě. Neprohlašovat výsledky za reprezentativní pro všechny návštěvníky. Žádné naměřené hodnoty v této dokumentaci nejsou.
+## Primary sources reviewed on 28 October 2026
 
-## Primární zdroje ověřené 28. 10. 2026
+- [Umami Funnel](https://docs.umami.is/docs/funnel)
+- [Umami Event data](https://docs.umami.is/docs/event-data)
+- [Umami UTM](https://docs.umami.is/docs/utm)
+- [Umami metric definitions](https://docs.umami.is/docs/metric-definitions)
 
-- [Umami Funnel](https://docs.umami.is/docs/funnel): pořadí kroků a význam Window.
-- [Umami Event data](https://docs.umami.is/docs/event-data): vlastnosti v Events/Properties.
-- [Umami UTM](https://docs.umami.is/docs/utm): standardní UTM včetně utm_content, přehled Views.
-- [Umami Metric definitions](https://docs.umami.is/docs/metric-definitions): URL/query, odvozené session a rozdíly metrik.
-
-Dokumentační odkaz /docs/filtering nebyl nástrojem dostupný. Žádný závěr o konkrétních oprávněních nebo filtrech účtu se na jeho nedostupnosti nezakládá.
+The unavailable `/docs/filtering` page was not used as evidence for any account-specific capability.

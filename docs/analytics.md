@@ -1,113 +1,108 @@
-# Konverzní analytika — Umami Cloud
+# Conversion Analytics — Umami Cloud
 
-Analytika je implementovaná a nasazená v demonstrační aplikaci. Původní popis a výsledky oprav níže pocházejí z 27. 10. 2026; tehdejší implementační krok sám neprováděl deployment ani skutečné analytické požadavky. Reklamní kampaně neproběhly. Možnosti filtrování a deduplikace v konkrétním dashboardu nejsou tímto dokumentem potvrzené.
+Analytics is implemented in the deployed demo. No advertising campaign has been run, and this documentation contains no measured campaign results. Dashboard filtering and deduplication capabilities must be verified in the actual Umami account before any conversion conclusions are reported.
 
-Aktuální demo doručuje materiály pouze předem schváleným testovacím příjemcům. Odpověď demo_not_allowed nevytváří form_error ani material_accepted; platný pokus zůstává form_submit po souhlasu. To omezuje interpretaci konverzí běžných návštěvníků; demo není testem veřejné kampaně.
+The demo sends materials only to pre-approved recipients. A `demo_not_allowed` response creates neither `form_error` nor `material_accepted`; after consent, the valid attempt remains recorded as `form_submit`. Public-visitor conversion rates therefore cannot be evaluated from the current demo.
 
-## Konfigurace a hranice
+## Configuration and boundaries
 
-- Script: https://cloud.umami.is/script.js; sběr aktuálního trackeru: https://gateway.umami.is/api/send.
-- Veřejné Website ID: `55615934-0f26-4e71-b7b2-d93427020fa6` — není API klíčem. Žádný Umami API klíč není potřeba.
-- Skript se renderuje až po souhlasu, pouze pokud server má `NODE_ENV=production` a `VERCEL_ENV=production` a prohlížeč má přesný hostname `etf-kompas-zeta.vercel.app`. Localhost, dev a preview měření nespouštějí. Kontroly prostředí se nesmějí oslabovat jen kvůli lokálnímu testu.
-- EU region a Hobby jsou potvrzení vlastníka, nikoli audit přihlášeného účtu. Sekce Events, Funnels a UTM podle vlastníka existují. Filtrování konkrétního funnelu podle UTM/event properties nebylo v účtu ověřeno. Nevymýšlíme výsledek ani naměřené konverze.
-- Načítání přes Next.js `next/script`, `afterInteractive`, pouze uvnitř klientského provideru. `data-auto-track=false`, `data-auto-pageview=false`, `data-performance=false`. Žádné automatické click listenery/History patching, identify, Distinct ID, výkon, replay ani heatmapy z našeho kódu.
+- Tracker: `https://cloud.umami.is/script.js`; current collection endpoint: `https://gateway.umami.is/api/send`.
+- Public Website ID: `55615934-0f26-4e71-b7b2-d93427020fa6`. It is not an API key; no Umami API key is required.
+- The script renders only after consent and only when both `NODE_ENV=production` and `VERCEL_ENV=production` are set and the browser hostname is exactly `etf-kompas-zeta.vercel.app`.
+- Localhost, development, and preview deployments do not send analytics. These guards must not be weakened for local testing.
+- The owner reported an EU-region Hobby account and access to Events, Funnels, and UTM views. This is not an authenticated account audit, and specific funnel filters were not verified.
+- The tracker is loaded through `next/script` with `afterInteractive`, `data-auto-track=false`, `data-auto-pageview=false`, and `data-performance=false`. Application code enables no automatic click tracking, history patching, identify calls, performance collection, replay, or heatmaps.
 
-## Souhlas
+## Consent model
 
-Lišta je v běžném toku nad hlavičkou, nikoli překryv či modal. Tlačítka mají stejný vizuální styl a minimálně 44 px. Nastavení je dostupné pod patičkou na všech stránkách. Při otevření nastavení dostane fokus nadpis, bez focus trapu. Kalkulačka i oba formuláře fungují nezávisle na volbě.
+The consent panel is part of the normal document flow, not a modal overlay. Both choices have equal visual weight and at least a 44 px target. Analytics settings remain available below the footer. The calculator and both forms work regardless of the choice.
 
-Právním základem zvolené analytiky je souhlas. Preference `etf-kompas.analytics-consent.v1` v localStorage obsahuje jen verzi 1, denied a čas odmítnutí. Odmítnutí je použitelné nejvýše 180 dní; při dalším čtení se expirovaný/neplatný záznam podle možností odstraní. Pokud odstranění selže, záznam se nikdy nepovažuje za platné povolení. Fyzické smazání není možné bez návštěvy webu a funkčního úložiště. Není to retenční slib Umami.
+Consent is the selected legal basis for analytics. The localStorage record `etf-kompas.analytics-consent.v1` stores only version 1, a denied state, and denial time. A denial is respected for at most 180 days. Invalid or expired records are removed where possible and are never treated as permission.
 
-**Povolení zůstává pouze v paměti aktuálního dokumentu**, včetně běžné klientské navigace. Po reloadu, plné navigaci nebo v jiné kartě je nutný nový výslovný opt-in. Pagehide zavírá gate i před zmrazením do BFCache; obnovení dokumentu z BFCache rovněž vyžaduje nové potvrzení. Staré persistentní granted záznamy z předchozí implementace se nikdy neaktivují a podle možností se odstraní. Toto konzervativní rozhodnutí řeší nemožnost spolehlivě trvale uložit odvolání při výpadku úložiště: žádný nový dokument nespoléhá na staré povolení. Není potřeba URL fragment ani návštěvnický identifikátor. Platnost povolení v jednom dlouho otevřeném dokumentu je navíc omezena na 180 dní; kontroluje se při každé události i v before-send, nejen periodickým UI časovačem.
+**Permission exists only in memory for the current document.** Reload, full navigation, a different tab, or BFCache restoration requires a new explicit opt-in. Historical persistent `granted` records are never activated and are removed where possible. Permission in one long-lived document also expires after 180 days and is checked during every event and in the before-send filter.
 
-Odvolání okamžitě zavře gate, zahodí fronty, zneplatní analytické pokusy a odpojí transport. Pokud se denied podaří uložit, reload odstraní vendor closure. Pokud zápis selže, stránka se neobnoví, zůstane zavřený gate i before-send a UI oznámí, že preference není trvale uložená. Opětovný explicitní souhlas může měření znovu aktivovat, ale focus, kotva, navigace ani zotavení úložiště ho nenahrazují. Již odeslané požadavky nelze vzít zpět.
+Withdrawal immediately closes the gate, discards queues, invalidates attempts, and disconnects transport. If denial can be persisted, the page reloads to remove vendor runtime. If storage fails, the document remains blocked and the UI explains that the preference could not be saved. Previously sent requests cannot be withdrawn.
 
-Mezi kartami stejného originu se předává pouze odmítnutí přes storage event a dostupný BroadcastChannel `etf-kompas.analytics-consent.v1`, zpráva `denied`. Povolení se nešíří do jiných karet. Příjemce zavře gate a při dřívějším povolení obnoví dokument. Pokud prohlížeč zablokuje oba komunikační kanály i zápis do sdílené storage, okamžitou notifikaci izolovaných již povolených karet nelze garantovat; odvolat v každé takové kartě nebo je zavřít. Při novém načtení už žádná staré povolení neobnoví. Není zde slib synchronizace mezi různými originy, profily nebo zařízeními.
+Only denial is synchronized between same-origin tabs through a storage event and BroadcastChannel `etf-kompas.analytics-consent.v1` with constant message `denied`. Permission, campaign data, and identifiers are never broadcast. If all cross-tab channels and storage are blocked, already permitted isolated tabs cannot be notified reliably and must be closed or revoked individually.
 
-Před souhlasem nevytváříme frontu historie ani analytický IntersectionObserver. Po souhlasu je při pomalém načítání trackeru paměťová fronta maximálně 32 transportních záznamů. Pro asynchronní viditelnost je navíc omezená fronta nejvýše 16 formulářových událostí na materiál. Přetečení/výpadek znamená ztrátu analytiky, nikdy blokaci aplikace. Žádné offline replay úložiště ani automatické opakování odeslaných událostí.
+Before consent, no analytics history queue or analytics IntersectionObserver exists. After consent, the in-memory transport queue is limited to 32 records, plus at most 16 pending form events per material while visibility is resolved. Overflow or service failure loses analytics but never blocks the application. There is no offline replay storage or automatic retry.
 
-## Události
+## Events
 
-| Název | Spouštěč a povolené vlastnosti |
+| Event | Trigger and allowed properties |
 | --- | --- |
-| landing_view | Jednou na měřený vstup na `/`; `ad_variant` |
-| calculator_change | Blur po skutečné platné změně; `field=monthly_contribution/years/gross_return`, `ad_variant`. Žádné hodnoty. Změna před souhlasem bez další editace po souhlasu se neodešle. |
-| etf_change | Skutečná změna selectu; `position=first/second`, `ticker=SPY/SPYM/VOO/IVV`, `ad_variant` |
-| form_view | IntersectionObserver: nejméně 10 % formuláře ve viewportu; jednou na formulář v měřeném vstupu; `material=report/guide`, `ad_variant` |
-| form_start | První focus/pointer interakce formuláře; odeslána jednou až po pozorovaném form_view; `material`, `ad_variant` |
-| form_submit | Po klientské validaci těsně před existujícím POST; `material`, `attempt=first/repeat`, `ad_variant` |
-| material_accepted | Pouze HTTP 202 a JSON `status=accepted`; `material`, `attempt`, `ad_variant` |
-| form_error | `material`, `error=validation/verification/busy/server/network`, případně `attempt`, `ad_variant` |
+| `landing_view` | Once per measured entry to `/`; `ad_variant` |
+| `calculator_change` | Blur after a real valid change; `field=monthly_contribution/years/gross_return`, `ad_variant`; never the value |
+| `etf_change` | Real select change; `position=first/second`, allowlisted `ticker`, `ad_variant` |
+| `form_view` | At least 10% of the form visible; once per material and measured entry; `material`, `ad_variant` |
+| `form_start` | First focus/pointer interaction, released only after `form_view`; `material`, `ad_variant` |
+| `form_submit` | After client validation and immediately before POST; `material`, `attempt=first/repeat`, `ad_variant` |
+| `material_accepted` | Only HTTP 202 with JSON `status=accepted`; `material`, `attempt`, `ad_variant` |
+| `form_error` | General category `validation/verification/busy/server/network`; `material`, optional `attempt`, `ad_variant` |
 
-`attempt` je jen první/opakovaný pokus o materiál v dokumentu; interní čítač a epoch souhlasu se nikam neodesílají. Stejný pokus lze dokončit analyticky jen jednou. Epoch zachycuje i měřený vstup: po opuštění landing page nebo změně explicitní kampaně se pozdní dokončení zahodí, nikdy nepřiřadí nové reklamě. Nativní invalid formulář může mít form_error bez form_submit. Nenahráváme hodnoty, stisky kláves, chyby ověření při pouhém načtení ani DOM snapshoty. Pokus zahájený před souhlasem a dokončený po něm se zpětně nepřidá. Žádné připojení analytických polí k e-mailovému API, žádné změny jeho allowlistu. Focus může předběhnout IntersectionObserver: v paměti se podrží pouze skutečnost interakce, form_start a případné další události se uvolní v pořadí až po skutečném form_view. Mount sám view nevytváří. Bez pozorované viditelnosti se buffer nepředá, při změně vstupu/souhlasu se zahodí.
+`attempt` distinguishes first and repeated attempts only within the current document. Consent epoch and internal counters are never sent. A pending completion is discarded after leaving the landing page or changing to a new explicit campaign, so it cannot be attributed to a different entry. Native form invalidity may produce `form_error` without `form_submit`.
 
-## Sanitizace a metadata
+No values, keystrokes, email data, form contents, DOM snapshots, request UUIDs, or tokens are recorded. Pre-consent activity is never backfilled. Focus may precede the visibility observer; only the fact of interaction is buffered and events are released in order after real visibility. Mounting alone is not a view.
 
-Typovaný wrapper a druhá runtime validace všech událostí. `data-before-send` je synchronní globální funkce definovaná před načtením scriptu. Přijme pouze event payloady, odmítá identify/performance a neznámé názvy/vlastnosti. Payload se sestavuje znovu z allowlistu, bez rozbalení původních metadat.
+## Payload sanitization
 
-Odesílá se pevné Website ID, hostname, titul ETF Kompas, cesta `/` se sanitizovanými UTM, omezený referrer, povolený název/vlastnosti. Referrer jen origin známých facebook/instagram/google/linkedin hostů uvedených v kódu; ostatní prázdný. Žádné cesty, query, login údaje nebo fragmenty referreru. Metadata screen/language/id/tag/default title se neodesílají. Globální Next metadata nastavují `Referrer-Policy` prostřednictvím meta `referrer=no-referrer`, script také `referrerPolicy=no-referrer`. To omezuje HTTP Referer, nikoli IP/UA.
+A typed wrapper and a second runtime validator enforce the event schema. The synchronous global `data-before-send` function is defined before tracker loading. It accepts only event payloads, rejects identify/performance and unknown names or properties, and rebuilds the payload from an allowlist rather than forwarding vendor metadata.
 
-Aktuální tracker přesto již při spuštění čte rozměry, jazyk, location, referrer a localStorage `umami.disabled`; filtr brání jejich nechtěnému odeslání, ne samotnému čtení. HTTP spojení zpřístupňuje Umami IP a User-Agent. Tracker má paměťový `x-umami-cache` z odpovědi služby; nevytváříme jej ani ho neukládáme, ale jde o další provozní metadata služby, nikoli o naši záruku anonymity. Umami používá odvozené identifikátory; naše aplikace žádné vlastní nepřidává. Po souhlasu proto nejde o tvrzení „bez jakékoli identifikace“. HTTP hlavičky spravované prohlížečem nelze sanitizovat hookem.
+The payload contains the fixed Website ID, hostname, ETF Kompas title, `/` with sanitized UTM values, a restricted referrer, and allowlisted event data. Referrers are reduced to the origin of known Facebook, Instagram, Google, or LinkedIn hosts; all others are blank. Paths, credentials, query strings, and fragments are removed. Screen, language, vendor ID/tag, and default title metadata are not sent.
 
-## UTM a reklamy
+The page sets `referrer=no-referrer`, and the script uses `referrerPolicy=no-referrer`. This limits the HTTP Referer but cannot hide IP address or User-Agent. The tracker itself may read browser metadata, location, referrer, and `umami.disabled`; the filter prevents forwarding unwanted fields but not local reads. Umami derives identifiers from network metadata. ETF Kompas adds no custom visitor ID and makes no claim of complete anonymity.
 
-Whitelist názvů i celých hodnot:
+## Campaign attribution
 
-- source: meta, facebook, instagram, google, linkedin, clientelo, demo
-- medium: paid_social, cpc, social, referral, demo
-- campaign: clientelo_demo, etf_kompas
-- content: ad_a, ad_b
+Allowlisted values:
 
-Neznámé i duplicitní parametry se zahodí. Osobní údaje pod známým názvem neprojdou. UTM se vyhodnotí až po souhlasu a kontext držíme jen v paměti povoleného dokumentu. Cesta ad_a → soukromí → holé / jej zachová. Nový explicitní povolený kampanový odkaz ho nahradí. Plné načtení dokumentu, návrat z BFCache, reload nebo odvolání jej zruší. Query-only App Router navigaci sleduje malý useSearchParams observer ve vlastní Suspense hranici; statický obsah stránky zůstává mimo ni. Neplatná explicitní kampanová hodnota přepne kontext na unknown, nepřevezme starou reklamu. Otevření soukromí před prvním souhlasem se zpětně nedoplňuje: pokud při povolení už UTM v dostupné URL není, atribuce zůstane unknown. Kontext se nepřenáší mezi kartami nebo zařízeními. Stejná sanitizovaná URL se používá i na následných událostech; neukládáme čtyři duplicitní event properties. Jediná doplňující `ad_variant=ad_a/ad_b/unknown` usnadňuje porovnání událostí, pokud UTM filtr v konkrétním funnelu nefunguje. Tato fallback vlastnost neznamená, že jsme ověřili ovládání dashboardu. Pokud ani event filtr není v reportu použitelný, porovnat Events přehledy s touto vlastností a uvést, že nejde o filtrovaný sekvenční funnel; neodvozovat falešná čísla.
+- source: `meta`, `facebook`, `instagram`, `google`, `linkedin`, `demo`;
+- medium: `paid_social`, `cpc`, `social`, `referral`, `demo`;
+- campaign: `etf_kompas_demo`, `etf_kompas`;
+- content: `ad_a`, `ad_b`.
 
-Výhradní schválené odkazy reklam (potvrzeno vlastníkem 28. 10. 2026):
+Unknown or duplicate parameters are discarded. Campaign context is evaluated only after consent and remains in document memory. An internal SPA path from an attributed landing page to privacy and back to bare `/` preserves the campaign. A new explicit valid campaign replaces it; invalid explicit values produce `unknown`. Reload, a new document, BFCache restoration, or withdrawal clears context.
 
-- A: https://etf-kompas-zeta.vercel.app/?utm_content=ad_a
-- B: https://etf-kompas-zeta.vercel.app/?utm_content=ad_b
+The approved variant links are:
 
-Hypotéza A: sdělení o nákladovosti zvýší zájem o personalizovaný report. Hypotéza B: vzdělávací sdělení zvýší zájem o průvodce. Přesné reklamní texty jsou připravené v [reklamním plánu](ads-and-conversions.md); směrové hypotézy nejsou výsledky experimentu a kampaně nebyly spuštěné. Pro férové srovnání držet stejné publikum, období a rozpočet. Bez nákladových dat reklam nelze určit cenu za konverzi.
+- A: `https://etf-kompas-zeta.vercel.app/?utm_content=ad_a`
+- B: `https://etf-kompas-zeta.vercel.app/?utm_content=ad_b`
 
-## Interpretace a funnel
+`utm_content` is the input URL parameter. The controller derives `ad_variant=ad_a/ad_b/unknown` for named events. `ad_variant` is not a supported input parameter.
 
-Jeden ručně poslaný pageview (bez name) + jeden pojmenovaný landing_view. Automatické pageviews vypnuté. Dva záznamy nejsou dvě návštěvy a nesmějí se sčítat. Strict Mode nebo opakovaný onReady nevytvoří další pageview. Nový dokument nebo návrat na `/` z jiné cesty je nový měřený vstup. Změna fragmentu není nový vstup.
+## Funnel and interpretation
 
-- Pageview: zaznamenání zobrazení stránky od aktivace měření.
-- Událost: interakce nebo výsledek, nikoli automaticky další zobrazení.
-- Návštěva a unikátní návštěvník: odvozené metriky služby; nejsou důkazem počtu fyzických osob a neodpovídají počtu HTTP požadavků. Umami používá IP/UA a rotující sůl.
-- Konverze: potvrzená odpověď aplikace po přijetí Resendem, nikoli doručení do schránky, unikátní kontakt nebo nově vytvořený e-mail. Idempotentní opakovaný požadavek může také skončit 202.
+One manually emitted pageview and one named `landing_view` are recorded per measured entry. They are not two visits and must not be added together.
 
-Dva zamýšlené materiálové funnely: landing_view → form_view → form_start → form_submit → material_accepted. Material=report/guide filtrovat pouze na formulářových krocích, pokud to report umožňuje; společný landing_view material nemá a globální filtr by jej mohl odstranit. Použitelnost filtrů a jednotku deduplikace ověřit v konkrétním účtu. Zvolit stejné Window, například 60 minut mezi sousedními kroky, nikoli automaticky pro celou cestu. Změna kalkulačky není povinný krok. Porovnávat konvertující měřené návštěvy ve stejném funnelu, ne dělit prosté součty opakovaných pokusů návštěvníky a nepovažovat to automaticky za procento osob. Měření pokrývá pouze souhlasící a neblokované prohlížeče; poměr nelze zobecnit na všechny návštěvníky. Žádné výsledky nejsou zatím k dispozici.
+The intended material funnel is:
 
-## Ověření bez skutečných e-mailů
+```text
+landing_view → form_view → form_start → form_submit → material_accepted
+```
 
-1. `npm run dev -- --webpack`, v prohlížeči localhost: před volbou ani po povolení se Umami nenačte (produkční guard). Vyzkoušet odmítnutí, kalkulačku, obě formulářová UI a Nastavení analytiky. Odesílání netestovat skutečnou adresou.
-2. `npm test` testuje kontroler, provider a komponenty s fake React/DOM/fetch. Žádné skutečné e-maily ani události. Test skutečného trackeru se standardně přeskočí, protože vendor soubor se neukládá do repozitáře.
-3. Pro izolovaný test aktuálního skutečného trackeru uložit veřejný script.js do dočasného souboru, nastavit pouze pro testovací proces `UMAMI_TRACKER_TEST_FILE` na jeho cestu a spustit `npm test`. VM má mock fetch; nic neposílá do Umami. Nikdy tento test nenahrazovat vyhodnocením trackeru v neizolovaném Node/browser prostředí.
-4. `npm run lint`; `$env:NODE_OPTIONS='--use-system-ca'; npm run build -- --webpack` v PowerShellu. Bez změn Application Control/TLS ověřování.
-5. Po samostatně schváleném deploymentu: čistý profil, Network Preserve log, filtrovat umami. Před volbou/po odmítnutí žádný script.js ani gateway požadavek. Po povolení právě jeden pageview + landing_view, ručně prohlédnout payload i HTTP Referer. Žádná citlivá data ani další metadata. Odvolat; po reloadu žádné další Umami požadavky. Již odeslané nelze stáhnout zpět.
-6. Projít A/B URL, obě cesty, viewport form_view a změny kalkulačky. V účtu ověřit Events, UTM, Funnels a skutečné možnosti jejich filtrů. Nezapisovat smyšlené výsledky. Každý další reálný e-mailový test vyžaduje výslovný souhlas vlastníka a schváleného testovacího příjemce. Automatické testy používají pouze mocky; dřívější skutečné doručení obou materiálů potvrdil vlastník, nikoli tato sada testů.
+Build separate report and guide views. `material` exists only on form events, so a global material filter may incorrectly remove `landing_view`; apply it only where supported per step. Calculator interaction is optional and must not be a mandatory conversion step.
 
-## Primární zdroje
+Provider acceptance is not mailbox delivery, a unique person, or necessarily a newly created message; an idempotent retry may return the original acceptance. Visits and unique visitors are derived Umami metrics, not counts of physical people. Analytics covers only consenting, unblocked, technically recorded activity and cannot be generalized to every visitor.
 
-- https://docs.umami.is/docs/tracker-configuration — auto-track, before-send, metadata
-- https://docs.umami.is/docs/tracker-functions — vlastní pageviews/payloady
-- https://docs.umami.is/docs/metric-definitions — IP, UA, odvozená identifikace
-- https://docs.umami.is/docs/cloud/faq — region, retence, spotřeba kvóty
-- https://docs.umami.is/docs/funnel a https://docs.umami.is/docs/utm
-- https://umami.is/dpa a https://umami.is/subprocessors
-- https://nextjs.org/docs/app/guides/scripts — Next Script
-- https://uoou.gov.cz/verejnost/qa-otazky-a-odpovedi/cookies — souhlas a nezbytné preference
+Umami's Funnel Window is the maximum interval between adjacent steps, not automatically the entire journey. A consistent 60-minute window between steps is the proposed configuration. Filters for `ad_variant`, per-step `material`, and the report's deduplication unit must be verified in the account. If unavailable, report only limited Events/Properties and UTM counts and do not present them as a verified sequential conversion funnel.
 
-Není to právní stanovisko ani potvrzení vyřešení dřívějších otevřených bodů hostingu a doručování.
+## Testing without real email or analytics
 
-## Opravy po závěrečném auditu (27. 10. 2026)
+1. Run `npm run dev -- --webpack`. On localhost, Umami must remain unloaded even after permission because the production guard is closed.
+2. Run `npm test`. Tests use fake React/DOM/fetch and send no email or analytics. The real-tracker test is skipped unless a fixture is supplied.
+3. For isolated tracker verification, download the public script to a temporary file, set `UMAMI_TRACKER_TEST_FILE` for the test process, and run `npm test`. The VM uses mock fetch and sends nothing to Umami.
+4. Run `npm run lint` and `$env:NODE_OPTIONS='--use-system-ca'; npm run build -- --webpack` in PowerShell.
+5. Any production browser inspection or real email request requires separate approval. Inspect Network before consent, after denial, after permission, and after withdrawal; never invent dashboard results.
 
-Původní fragmentový fallback umožňoval po selhání zápisu a obnově storage oživit starý souhlas. Byl odstraněn ve prospěch explicitního povolení v paměti dokumentu. Opraveno také připsání pozdního POST nové kampani, pořadí focus/observer, zachování post-consent kampaně při SPA návratu ze soukromí a expirace při odesílání. Regrese používají fake DOM/React, mock POST a BroadcastChannel; nejde o důkaz chování všech reálných browser profilů. Skutečné oddělené karty, BFCache a omezení storage na mobilním Safari zůstávají ruční kontrolou.
+## Primary sources
 
-Finální kontroly této opravy: 83/83 testů včetně skutečného vendor trackeru v izolované VM s mock sítí. Bez souboru UMAMI_TRACKER_TEST_FILE se jeden volitelný vendor test standardně přeskočí. Žádné skutečné e-maily ani analytické události nebyly odeslány.
+- [Tracker configuration](https://docs.umami.is/docs/tracker-configuration)
+- [Tracker functions](https://docs.umami.is/docs/tracker-functions)
+- [Metric definitions](https://docs.umami.is/docs/metric-definitions)
+- [Cloud regions and retention](https://docs.umami.is/docs/cloud/faq)
+- [Funnels](https://docs.umami.is/docs/funnel) and [UTM reports](https://docs.umami.is/docs/utm)
+- [Umami DPA](https://umami.is/dpa) and [subprocessors](https://umami.is/subprocessors)
+- [Next.js Script guide](https://nextjs.org/docs/app/guides/scripts)
+- [Czech DPA guidance on cookies](https://uoou.gov.cz/verejnost/qa-otazky-a-odpovedi/cookies)
 
-## Audit reklamních variant — 28. 10. 2026
-
-Přesné zadání reklam, schválené URL, konverzní metriky a plán vyhodnocení jsou v [ads-and-conversions.md](ads-and-conversions.md). Vlastník schválil variantu bez změny kódu: vstupní URL parametr je výhradně `utm_content` s hodnotou ad_a nebo ad_b. Z něj kontroler odvodí vlastnost analytické události `ad_variant`; tento název není vstupní URL parametr. Návrh aliasu nebyl vybrán a nečeká na implementaci. Odkazy neobsahují zdroj, medium ani název kampaně; měření varianty tím není omezeno.
-
-Upřesnění interpretace: Umami Funnel vyžaduje pořadí a jeho Window omezuje interval mezi sousedními kroky, nikoli automaticky celou cestu. Kalkulačka je volitelný mezikrok, nesmí vylučovat konverze výchozího scénáře nebo průvodce. `material` mají jen formulářové události; globální filtr materiálu může odstranit landing_view. Možnost filtrovat materiál na jednotlivých krocích a variantu na všech krocích je nutné ověřit v konkrétním účtu. Prosté poměry celkových počtů eventů nejsou náhradou deduplikovaného konverzního funnelu. Aktuální audit neposkytuje výsledky kampaní.
+This document is not legal advice and does not resolve the separate open questions concerning hosting, email delivery, and provider agreements.
