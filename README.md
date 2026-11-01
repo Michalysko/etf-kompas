@@ -160,3 +160,7 @@ The [`ai-log`](ai-log/README.md) directory remains in its original language beca
 ## Project status
 
 ETF Kompas is a completed portfolio and learning project maintained as a public demonstration. Its calculation, protected demo delivery flows, and automated checks are functional; the limitations described above are intentional and should not be interpreted as production readiness for a public financial or marketing service.
+
+## License
+
+The source code is available under the [MIT License](LICENSE). ETF names, issuer names, trademarks, source materials, and third-party services remain the property of their respective owners.
